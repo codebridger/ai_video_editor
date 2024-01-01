@@ -1,5 +1,18 @@
-import path from "path";
+import path, { dirname } from "path";
+import dotenv from "dotenv";
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+const envPath = path.join(__dirname, "../.env");
+debugger;
+log("Loading env file", envPath);
+dotenv.config({
+  path: envPath,
+});
+
 import { ReadableStream } from "web-streams-polyfill";
+import figlet from "figlet";
+
 // @ts-ignore
 global.ReadableStream = ReadableStream;
 
@@ -9,11 +22,14 @@ import {
   readAllVideos,
   readTextFile,
   writeTextFile,
-} from "./utils/fs-utils";
-import { convertToSound, cutVideo, mergeVideos } from "./utils/ffmpeg-utils";
-import { storeTranscript } from "./utils/ai-utils";
-import { summaryChain } from "./chains/summary_chain";
-import { gettimeCutsFromTranscript } from "./utils/transcript.util";
+} from "./utils/fs-utils.js";
+import { convertToSound, cutVideo, mergeVideos } from "./utils/ffmpeg-utils.js";
+import { storeTranscript } from "./utils/ai-utils.js";
+import { getSummaryChain } from "./chains/summary_chain.js";
+import { gettimeCutsFromTranscript } from "./utils/transcript.util.js";
+import { run } from "./pipeline.js";
+import { fileURLToPath } from "url";
+import { log } from "console";
 
 const videosRoot = path.join(
   "/Users/navid-shad/Youtube_project/Making of Ai video editor"
@@ -23,6 +39,7 @@ const tempRoot = path.join(__dirname, "../tmp");
 createFolder(tempRoot);
 
 async function main() {
+  const summaryChain = getSummaryChain();
   //
   // 1. Reading a list of videos
   //
@@ -118,4 +135,17 @@ async function main() {
   // -- ffmpeg
 }
 
+figlet.text(
+  "AI Video Editor",
+  {
+    horizontalLayout: "default",
+    verticalLayout: "default",
+  },
+  (err, data) => {
+    console.log(data);
+    // main();
+  }
+);
+
 main();
+// run();

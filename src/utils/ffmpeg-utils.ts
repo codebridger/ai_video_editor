@@ -1,5 +1,5 @@
 import ffmpeg from "fluent-ffmpeg";
-import { createFolder } from "./fs-utils";
+import { createFolder } from "./fs-utils.js";
 
 export function convertToSound(videoPath: string, output: string) {
   return new Promise((done, reject) => {

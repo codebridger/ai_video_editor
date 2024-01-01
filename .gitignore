@@ -3,3 +3,5 @@ videos
 tmp/*
 .env
 .DS_Store
+build
+dist

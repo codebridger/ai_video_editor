@@ -28,12 +28,14 @@ const chatPromptTemplate = ChatPromptTemplate.fromMessages([
   ],
 ]);
 
-const model = new OpenAIChat({
-  openAIApiKey: process.env.OPENAI_API_KEY,
-  modelName: "gpt-4-1106-preview",
-});
+export function getSummaryChain() {
+  const model = new OpenAIChat({
+    openAIApiKey: process.env.OPENAI_API_KEY,
+    modelName: "gpt-4-1106-preview",
+  });
 
-export const summaryChain = new LLMChain({
-  llm: model,
-  prompt: chatPromptTemplate,
-});
+  return new LLMChain({
+    llm: model,
+    prompt: chatPromptTemplate,
+  });
+}

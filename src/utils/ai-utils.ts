@@ -1,16 +1,16 @@
 import OpenAI from "openai";
 import fs from "fs";
-import { writeTextFile } from "./fs-utils";
-
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+import { writeTextFile } from "./fs-utils.js";
 
 export async function storeTranscript(
   soundFilePath: string,
   outputFilePath: string,
   language: string
 ) {
+  const openai = new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY,
+  });
+
   // read audio file and get openai transcript
   const audio = fs.createReadStream(soundFilePath);
 
