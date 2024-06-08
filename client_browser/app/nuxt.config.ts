@@ -45,7 +45,7 @@ export default defineNuxtConfig({
   },
 
   extends: [
-    "../layers/modular-rest",
+    "../layers/video-project",
     /**
      * This extends the base Tairo layer.
      *
@@ -65,6 +65,9 @@ export default defineNuxtConfig({
         giget: { auth: process.env.GIGET_AUTH_TOKEN },
       },
     ],
+
+    "../layers/modular-rest",
+
     [
       "gh:cssninjaStudio/tairo/layers/tairo#v1.5.1",
       {
