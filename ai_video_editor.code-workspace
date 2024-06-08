@@ -7,7 +7,7 @@
       "path": "server"
     },
     {
-      "path": "client-browser"
+      "path": "client_browser"
     },
     {
       "path": "."
