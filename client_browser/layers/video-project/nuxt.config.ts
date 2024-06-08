@@ -3,7 +3,12 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
 
   extends: [
-    // enable the iconnav layout layer
-    "gh:cssninjaStudio/tairo/layers/tairo-layout-iconnav#v1.5.1",
+    [
+      "gh:cssninjaStudio/tairo/layers/tairo-layout-collapse#v1.5.1",
+      {
+        install: true,
+        giget: { auth: process.env.GIGET_AUTH_TOKEN },
+      },
+    ],
   ],
 });

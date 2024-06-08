@@ -8,9 +8,34 @@
  *
  */
 
+const toolbar = {
+  enabled: true,
+  showTitle: true,
+  showNavBurger: true,
+  tools: [
+    {
+      component: "ThemeToggle",
+    },
+    {
+      component: "ToolbarAccountMenu",
+    },
+  ],
+};
+
 export default defineAppConfig({
   tairo: {
-    title: "Subturtle",
+    title: "Video Editor",
+    iconnav: {
+      circularMenu: {
+        enabled: true,
+        tools: [],
+      },
+      toolbar: toolbar,
+      navigation: {
+        enabled: true,
+        items: [],
+      },
+    },
     collapse: {
       circularMenu: {
         enabled: true,
@@ -23,19 +48,7 @@ export default defineAppConfig({
           },
         ],
       },
-      toolbar: {
-        enabled: true,
-        showTitle: true,
-        showNavBurger: true,
-        tools: [
-          {
-            component: "ThemeToggle",
-          },
-          {
-            component: "ToolbarAccountMenu",
-          },
-        ],
-      },
+      toolbar: toolbar,
       navigation: {
         enabled: true,
 

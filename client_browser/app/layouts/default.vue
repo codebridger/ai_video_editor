@@ -1,1 +1,5 @@
-<template></template>
+<template>
+  <TairoIconnavLayout>
+    <slot />
+  </TairoIconnavLayout>
+</template>
