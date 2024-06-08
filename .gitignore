@@ -3,3 +3,4 @@ videos
 tmp/*
 .env
 .DS_Store
+dist
