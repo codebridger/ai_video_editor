@@ -1,8 +1,17 @@
 {
-	"folders": [
-		{
-			"path": "."
-		}
-	],
-	"settings": {}
+  "folders": [
+    {
+      "path": "terminal-app"
+    },
+    {
+      "path": "server"
+    },
+    {
+      "path": "client-browser"
+    },
+    {
+      "path": "."
+    }
+  ],
+  "settings": {}
 }
