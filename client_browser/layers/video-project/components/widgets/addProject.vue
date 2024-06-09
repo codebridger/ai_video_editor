@@ -45,16 +45,16 @@
 
 <script lang="ts" setup>
 import { useForm, useFieldError } from "vee-validate";
-import { dataProvider } from "@modular-rest/client";
 import * as yup from "yup";
 
 import { $t } from "~/composables/i18n";
-import { VIDEO_PROJECT_DATABASE } from "../../types/project.type";
+import { useVideoProjects } from "../../store/videoProject";
 
 const addModal = ref(false);
 const isPending = ref(false);
 
 const i18n = useI18n();
+const videoProjects = useVideoProjects();
 
 const { defineField, resetForm, validate } = useForm({
   validationSchema: {
@@ -74,15 +74,8 @@ async function submit() {
     return;
   }
 
-  return dataProvider
-    .insertOne({
-      database: VIDEO_PROJECT_DATABASE.DATABASE,
-      collection: VIDEO_PROJECT_DATABASE.PROJECT_COLLECTION,
-      doc: {
-        title: title.value,
-        userId: authUser.value?.id,
-      },
-    })
+  return videoProjects
+    .createProject(title.value)
     .then(() => {
       isPending.value = false;
       addModal.value = false;
