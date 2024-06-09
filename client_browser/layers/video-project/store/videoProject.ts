@@ -31,7 +31,9 @@ export const useVideoProjects = defineStore("videoProjects", () => {
     isLoading.value = true;
     return listController
       .fetchPage(page)
-      .then((list) => (projects.value = list))
+      .then((list) => {
+        projects.value = JSON.parse(JSON.stringify(list));
+      })
       .finally(() => (isLoading.value = false));
   }
 

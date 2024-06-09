@@ -1,8 +1,8 @@
 <template>
-  <div class="container">TimeLine</div>
+  <div>dfsdf</div>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 definePageMeta({
   layout: "project",
 });

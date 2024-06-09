@@ -4,7 +4,7 @@ export default defineNuxtConfig({
 
   extends: [
     [
-      "gh:cssninjaStudio/tairo/layers/tairo-layout-collapse#v1.5.1",
+      "gh:cssninjaStudio/tairo/layers/tairo-layout-sidebar#v1.5.1",
       {
         install: true,
         giget: { auth: process.env.GIGET_AUTH_TOKEN },

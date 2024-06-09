@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { dataProvider, functionProvider } from "@modular-rest/client";
 import { useVideoProjects } from "../../../layers/video-project/store/videoProject";
+
+const { setupSidebarLayout } = useSidebarSetup();
 
 // set compile time meta information
 definePageMeta({
@@ -14,10 +15,10 @@ useHead({
   meta: [{ name: "description", content: "AI Video Editor" }],
 });
 
-const videoStore = useVideoProjects();
+const projectsStore = useVideoProjects();
 
-onMounted(async () => {
-  await videoStore.initialize();
+onMounted(() => {
+  projectsStore.initialize();
 });
 </script>
 
@@ -32,7 +33,7 @@ onMounted(async () => {
     </template>
 
     <template #default>
-      <div class="flex flex-col space-y-2">
+      <div class="flex flex-col space-y-2" v-if="!projectsStore.isLoading">
         <TransitionGroup
           mode="out-in"
           enter-active-class="transition-opacity duration-500"
@@ -42,8 +43,12 @@ onMounted(async () => {
           leave-from-class="opacity-100"
           leave-to-class="opacity-0"
         >
-          <template v-for="project of videoStore.projects" :key="project._id">
+          <template
+            v-for="project of projectsStore.projects"
+            :key="project._id"
+          >
             <BaseCard
+              @mouseenter="setupSidebarLayout(project._id)"
               class="w-full py-6 px-8 flex justify-between items-center"
               shadow="hover"
             >
@@ -52,10 +57,12 @@ onMounted(async () => {
               </span>
 
               <div class="flex space-x-2">
-                <BaseButton>{{ $t("edit") }}</BaseButton>
+                <BaseButton :to="'/project-' + project._id + '/timeline'">{{
+                  $t("edit")
+                }}</BaseButton>
 
                 <BaseButtonIcon
-                  @click="videoStore.removeById(project._id)"
+                  @click="projectsStore.removeById(project._id)"
                   color="primary"
                 >
                   <Icon name="i-solar-trash-bin-2-broken" />
@@ -68,13 +75,13 @@ onMounted(async () => {
 
       <BasePagination
         class="my-8"
-        :page-size="videoStore.pagination.limit"
-        :item-per-page="videoStore.pagination.limit"
-        :total-items="videoStore.pagination.total"
-        :current-page="videoStore.pagination.page"
+        :page-size="projectsStore.pagination.limit"
+        :item-per-page="projectsStore.pagination.limit"
+        :total-items="projectsStore.pagination.total"
+        :current-page="projectsStore.pagination.page"
         :max-links-displayed="5"
         rounded="sm"
-        @update:currentPage="videoStore.fetchPage($event)"
+        @update:currentPage="projectsStore.fetchPage($event)"
       />
     </template>
   </TairoContentWrapper>
