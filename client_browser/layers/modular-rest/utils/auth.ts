@@ -1,6 +1,6 @@
 import { authentication, dataProvider } from "@modular-rest/client";
 import type User from "@modular-rest/client/dist/class/user";
-import { COLLECTIONS, DATABASE, type ProfileType } from "~/types/database.type";
+import { USER_CONTENT, type ProfileType } from "~/types/database.type";
 
 export const isLogin = ref(false);
 export const authUser = ref<User | null>(null);
@@ -9,8 +9,8 @@ export const profileInfo = ref<ProfileType | null>(null);
 function getProfileInfo() {
   return dataProvider
     .findOne<ProfileType>({
-      database: DATABASE.USER_CONTENT,
-      collection: COLLECTIONS.PROFILE,
+      database: USER_CONTENT.DATABASE,
+      collection: USER_CONTENT.PROFILE_COLLECTION,
       query: {
         refId: authUser.value?.id,
       },

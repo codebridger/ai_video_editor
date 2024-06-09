@@ -1,11 +1,14 @@
 const { getCollection } = require("@modular-rest/server/src");
-const { DATABASE, PROFILE_COLLECTION } = require("../../config");
+const { USER_CONTENT } = require("../../config");
 
 module.exports.updateUserProfile = async (
   { refId, gPicture, name },
   rewrite = false
 ) => {
-  const profileCollection = getCollection(DATABASE, PROFILE_COLLECTION);
+  const profileCollection = getCollection(
+    USER_CONTENT.DATABASE,
+    USER_CONTENT.PROFILE_COLLECTION
+  );
 
   const isExist = await profileCollection.findOne({ refId });
 

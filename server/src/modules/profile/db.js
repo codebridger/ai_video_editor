@@ -5,11 +5,11 @@ const {
   Schemas,
 } = require("@modular-rest/server");
 
-const { DATABASE, PROFILE_COLLECTION } = require("../../config");
+const { USER_CONTENT } = require("../../config");
 
 const profileCollection = new CollectionDefinition({
-  db: DATABASE,
-  collection: PROFILE_COLLECTION,
+  db: USER_CONTENT.DATABASE,
+  collection: USER_CONTENT.PROFILE_COLLECTION,
   schema: new Schema(
     {
       gPicture: String,

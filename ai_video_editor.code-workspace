@@ -1,13 +1,18 @@
 {
   "folders": [
-    {
-      "path": "terminal-app"
-    },
+    // {
+    //   "path": "terminal-app"
+    // },
     {
       "path": "server"
     },
     {
-      "path": "client_browser"
+      "path": "client_browser",
+      "name": "Client Browser"
+    },
+    {
+      "path": "client_browser/layers/video-project",
+      "name": "Video Project Layer"
     },
     {
       "path": "."

@@ -15,18 +15,13 @@ useHead({
 </script>
 
 <template>
-  <section
-    :class="[
-      'w-full flex flex-col space-y-4 items-start',
-      'md:flex-row md:space-x-4 md:space-y-0',
-    ]"
-  ></section>
-
-  <div class="flex justify-between mt-4 mb-2">
-    <BaseHeading>{{ $t("page.dashboard.recent") }}</BaseHeading>
-  </div>
-
-  <section
-    class="tablet:grid-cols-2 grid w-full gap-4 lg:grid-cols-3"
-  ></section>
+  <TairoContentWrapper>
+    <template #left>
+      <span>Your Projects</span>
+    </template>
+    <template #right>
+      <WidgetsAddProject />
+    </template>
+    <template> </template>
+  </TairoContentWrapper>
 </template>
