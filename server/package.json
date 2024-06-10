@@ -14,7 +14,7 @@
     "dev": "nodemon -q src/index.js"
   },
   "dependencies": {
-    "@modular-rest/server": "^1.4.2",
+    "@modular-rest/server": "/Users/navid-shad/Projects/Personal/modular-rest/packages/server",
     "dotenv": "^16.4.5",
     "googleapis": "^140.0.0"
   },

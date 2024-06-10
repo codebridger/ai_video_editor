@@ -11,8 +11,7 @@
     "nuxt": "3.11.2",
     "pinia": "^2.1.7",
     "vee-validate": "^4.13.1",
-    "yup": "^1.4.0",
-    "@modular-rest/client": "^1.6.2"
+    "yup": "^1.4.0"
   },
   "devDependencies": {
     "@nuxt/eslint-config": "^0.1.1",

@@ -12,6 +12,10 @@
       "name": "Video Project Layer"
     },
     {
+      "path": "client_browser/layers/modular-rest",
+      "name": "Modular Rest Layer"
+    },
+    {
       "path": "server"
     },
     {

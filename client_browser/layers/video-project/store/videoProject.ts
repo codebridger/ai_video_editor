@@ -27,16 +27,6 @@ export const useVideoProjects = defineStore("videoProjects", () => {
   const pagination = computed(() => listController.pagination);
   const isLoading = ref(false);
 
-  function fetchPage(page: number) {
-    isLoading.value = true;
-    return listController
-      .fetchPage(page)
-      .then((list) => {
-        projects.value = JSON.parse(JSON.stringify(list));
-      })
-      .finally(() => (isLoading.value = false));
-  }
-
   async function initialize() {
     isLoading.value = true;
 
@@ -46,6 +36,16 @@ export const useVideoProjects = defineStore("videoProjects", () => {
     } catch (error) {
       isLoading.value = false;
     }
+  }
+
+  function fetchPage(page: number) {
+    isLoading.value = true;
+    return listController
+      .fetchPage(page)
+      .then((list) => {
+        projects.value = JSON.parse(JSON.stringify(list));
+      })
+      .finally(() => (isLoading.value = false));
   }
 
   function createProject(title: string) {
@@ -90,6 +90,17 @@ export const useVideoProjects = defineStore("videoProjects", () => {
       });
   }
 
+  function fetchById(id: string) {
+    return dataProvider.findOne<ProjectType>({
+      database: VIDEO_PROJECT_DATABASE.DATABASE,
+      collection: VIDEO_PROJECT_DATABASE.PROJECT_COLLECTION,
+      query: {
+        userId: authUser.value?.id,
+        _id: id,
+      },
+    });
+  }
+
   return {
     projects,
     pagination,
@@ -98,5 +109,6 @@ export const useVideoProjects = defineStore("videoProjects", () => {
     isLoading,
     removeById,
     createProject,
+    fetchById,
   };
 });

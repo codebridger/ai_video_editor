@@ -9,10 +9,23 @@
   dependencies:
     vary "^1.1.2"
 
-"@modular-rest/server@^1.4.2":
+"@modular-rest/server@/Users/navid-shad/Projects/Personal/modular-rest/packages/server":
   version "1.11.5"
-  resolved "https://registry.yarnpkg.com/@modular-rest/server/-/server-1.11.5.tgz#89a2821d8a198d4f55792ec4c867e390e5645250"
-  integrity sha512-z/9tsWmxpfSQjQjA/VbCsuLCCy7tznJS8S0+/AAM4g7rQ+hfqD8qnPCr6HCBgPDWo0lbA9AIUdXQhh9xWFiiOg==
+  dependencies:
+    "@koa/cors" "^3.1.0"
+    colog "^1.0.4"
+    file-system "^2.2.2"
+    jsonwebtoken "^8.5.1"
+    keypair "^1.0.4"
+    koa "^2.5.3"
+    koa-body "^4.2.0"
+    koa-router "^7.4.0"
+    koa-static-server "^1.5.2"
+    mongoose "^5.10.9"
+    nested-property "^4.0.0"
+
+"@modular-rest/server@file:../../modular-rest/packages/server":
+  version "1.11.5"
   dependencies:
     "@koa/cors" "^3.1.0"
     colog "^1.0.4"

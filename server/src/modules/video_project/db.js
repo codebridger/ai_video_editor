@@ -14,7 +14,8 @@ const projectCollection = new CollectionDefinition({
     {
       title: String,
       userId: String,
-      originalFiles: [Schemas.file],
+      // Original files stored into file collection with projectId as tag
+      // originalFiles: [Schemas.file],
     },
     { timestamps: true }
   ),

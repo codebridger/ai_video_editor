@@ -814,10 +814,14 @@
     "@rollup/pluginutils" "^5.1.0"
     json5 "^2.2.3"
 
-"@modular-rest/client@^1.6.2":
+"@modular-rest/client@/Users/navid-shad/Projects/Personal/modular-rest/packages/client":
   version "1.6.2"
-  resolved "https://registry.npmjs.org/@modular-rest/client/-/client-1.6.2.tgz"
-  integrity sha512-QXwvymeLpk9uLvu2NR3BCsVN2WfaiuS5JcDAYOKJGN5ta2D0gLb56ix3CBg8D/970DZ/KKLYwU24+CtAOJaovg==
+  dependencies:
+    axios "^0.21.0"
+    ts-bus "^2.3.1"
+
+"@modular-rest/client@file:../../modular-rest/packages/client":
+  version "1.6.2"
   dependencies:
     axios "^0.21.0"
     ts-bus "^2.3.1"

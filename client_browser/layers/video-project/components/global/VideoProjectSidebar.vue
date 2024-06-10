@@ -1,18 +1,32 @@
 <template>
+  <div
+    :class="[
+      'p-1 h-1/2 border-solid border-b-2 border-b-gray-200 dark:border-muted-700',
+      'flex flex-wrap content-start',
+    ]"
+  >
+    <template
+      v-for="projectFile in mediaManagerStore.projectFiles"
+      :key="projectFile._id"
+    >
+      <WidgetsProjectFileCard :file="projectFile" />
+    </template>
+  </div>
+
   <div class="p-4">
     <BaseFullscreenDropfile
       icon="ph:image-duotone"
       :filter-file-dropped="(file) => file.type.startsWith('image')"
       @drop="
         (value) => {
-          uploadedFiles = value;
+          mediaManagerStore.uploadList = value;
         }
       "
     />
 
     <BaseInputFileHeadless
-      v-slot="{ open, remove, preview, drop, files }"
-      v-model="uploadedFiles"
+      v-slot="{ open, remove, drop, files }"
+      v-model="mediaManagerStore.uploadList"
       multiple
     >
       <!-- Controls -->
@@ -87,81 +101,12 @@
         </div>
 
         <ul v-else class="mt-6 space-y-2">
-          <li v-for="file in files" :key="file.name">
-            <div
-              class="border-muted-200 dark:border-muted-700 dark:bg-muted-800 relative flex items-center justify-end gap-2 rounded-xl border bg-white p-3"
-            >
-              <div class="flex items-center gap-2">
-                <div class="shrink-0">
-                  <img
-                    v-if="file.type.startsWith('image')"
-                    class="size-14 rounded-xl object-cover object-center"
-                    :src="preview(file).value"
-                    alt="Image preview"
-                  />
-
-                  <img
-                    v-else
-                    class="size-14 rounded-xl object-cover object-center"
-                    src="/img/avatars/placeholder-file.png"
-                    alt="Image preview"
-                  />
-                </div>
-
-                <div class="font-sans">
-                  <span
-                    class="text-muted-800 dark:text-muted-100 line-clamp-1 block text-sm"
-                  >
-                    {{ file.name }}
-                  </span>
-
-                  <span class="text-muted-400 block text-xs">
-                    {{ formatFileSize(file.size) }}
-                  </span>
-                </div>
-              </div>
-
-              <div
-                class="ms-auto w-32 px-4 transition-opacity duration-300"
-                :class="'opacity-100'"
-              >
-                <BaseProgress :value="0" size="xs" :color="'success'" />
-              </div>
-
-              <div class="flex gap-2">
-                <button
-                  class="border-muted-200 hover:border-primary-500 text-muted-700 dark:text-muted-200 hover:text-primary-600 dark:border-muted-700 dark:bg-muted-900 dark:hover:border-primary-500 dark:hover:text-primary-600 relative flex size-8 cursor-pointer items-center justify-center rounded-full border bg-white transition-colors duration-300 disabled:cursor-not-allowed disabled:opacity-60"
-                  disabled
-                  type="button"
-                  tooltip="Cancel"
-                >
-                  <Icon name="lucide:slash" class="size-4" />
-
-                  <span class="sr-only">Cancel</span>
-                </button>
-
-                <button
-                  class="border-muted-200 hover:border-primary-500 text-muted-700 dark:text-muted-200 hover:text-primary-600 dark:border-muted-700 dark:bg-muted-900 dark:hover:border-primary-500 dark:hover:text-primary-600 relative flex size-8 cursor-pointer items-center justify-center rounded-full border bg-white transition-colors duration-300"
-                  type="button"
-                  tooltip="Upload"
-                >
-                  <Icon name="lucide:arrow-up" class="size-4" />
-
-                  <span class="sr-only">Upload</span>
-                </button>
-
-                <button
-                  class="border-muted-200 hover:border-primary-500 text-muted-700 dark:text-muted-200 hover:text-primary-600 dark:border-muted-700 dark:bg-muted-900 dark:hover:border-primary-500 dark:hover:text-primary-600 relative flex size-8 cursor-pointer items-center justify-center rounded-full border bg-white transition-colors duration-300"
-                  type="button"
-                  tooltip="Remove"
-                  @click.prevent="remove(file)"
-                >
-                  <Icon name="lucide:x" class="size-4" />
-
-                  <span class="sr-only">Remove</span>
-                </button>
-              </div>
-            </div>
+          <li
+            v-for="file in mediaManagerStore.uploadList"
+            :key="file.name"
+            :data-nui-tooltip="file.name"
+          >
+            <WidgetsUploadingFileCard :file="file" @remove="remove(file)" />
           </li>
         </ul>
       </div>
@@ -170,5 +115,7 @@
 </template>
 
 <script setup lang="ts">
-const uploadedFiles = ref<FileList | null>(null);
+import { useMediaManagerStore } from "../../store/mediaManager";
+
+const mediaManagerStore = useMediaManagerStore();
 </script>

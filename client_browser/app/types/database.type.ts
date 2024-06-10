@@ -1,4 +1,4 @@
-import { type FileDocument } from "@modular-rest/client/dist/types/types";
+import { type Types } from "@modular-rest/client";
 
 export const USER_CONTENT = {
   DATABASE: "user_content",
@@ -10,5 +10,5 @@ export interface ProfileType {
   refId: string;
   name: string;
   gPicture: string;
-  images: FileDocument[];
+  images: Types.FileDocument[];
 }
