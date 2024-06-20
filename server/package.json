@@ -16,7 +16,9 @@
   "dependencies": {
     "@modular-rest/server": "/Users/navid-shad/Projects/Personal/modular-rest/packages/server",
     "dotenv": "^16.4.5",
-    "googleapis": "^140.0.0"
+    "fluent-ffmpeg": "^2.1.3",
+    "googleapis": "^140.0.0",
+    "openai": "^4.52.0"
   },
   "devDependencies": {
     "nodemon": "^3.0.1"

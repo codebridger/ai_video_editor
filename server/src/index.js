@@ -3,10 +3,13 @@ const {
   createRest,
   DatabaseTrigger,
   getCollection,
+  CmsTrigger,
 } = require("@modular-rest/server");
+
 const permissionGroups = require("./permissions").permissionGroups;
 
 const path = require("path");
+const { projectFileTriggers } = require("./modules/video_project/triggers");
 
 // Load .env file
 require("dotenv").config({
@@ -50,6 +53,7 @@ const app = createRest({
   },
   permissionGroups,
   authTriggers: [],
+  fileTriggers: [...projectFileTriggers],
 }).catch((err) => {
   console.error(err);
   process.exit(1);
