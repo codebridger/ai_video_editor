@@ -14,8 +14,6 @@ const projectCollection = new CollectionDefinition({
     {
       title: String,
       userId: String,
-      // Original files stored into file collection with projectId as tag
-      // originalFiles: [Schemas.file],
     },
     { timestamps: true }
   ),
@@ -30,4 +28,23 @@ const projectCollection = new CollectionDefinition({
   ],
 });
 
-module.exports = [projectCollection];
+const transcriptSegmentCollection = new CollectionDefinition({
+  db: VIDEO_PROJECT.DATABASE,
+  collection: VIDEO_PROJECT.TRANSCRIPT_SEGMENT_COLLECTION,
+  schema: new Schema(
+    {
+      fileId: String,
+      segments: [
+        {
+          start: Number,
+          end: Number,
+          text: String,
+        },
+      ],
+    },
+    { timestamps: true }
+  ),
+  permissions: [],
+});
+
+module.exports = [projectCollection, transcriptSegmentCollection];
