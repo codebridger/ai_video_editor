@@ -7,7 +7,7 @@
         :label="props.title"
         class="h-32 p-2 border-solid border-[1px] border-gray-200 dark:border-muted-700"
         placeholder="Type here..."
-        @input="emit('update:modelValue', $event)"
+        @update:model-value="emit('update:modelValue', $event)"
       />
     </div>
 

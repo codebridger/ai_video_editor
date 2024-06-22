@@ -7,4 +7,5 @@ module.exports.VIDEO_PROJECT = {
   DATABASE: "video_project",
   PROJECT_COLLECTION: "project",
   VIDEO_MEDIA: "video_media",
+  VIDEO_REVISION: "video_revision",
 };

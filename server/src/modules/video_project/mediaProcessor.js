@@ -5,6 +5,8 @@ const OpenAI = require("openai");
 const fs = require("fs");
 const { VIDEO_PROJECT } = require("../../config");
 
+const temptDir = path.join(require.main?.path || process.cwd(), "..", "temp");
+
 function createFolder(folderPath) {
   return new Promise((resolve, reject) => {
     require("fs").mkdir(folderPath, { recursive: true }, (err) => {
@@ -53,6 +55,7 @@ async function processVideo(fileDoc) {
     .insertMany([
       {
         fileId: id,
+        projectId: tag,
         format: formatProp,
         isProcessed,
         segments,
@@ -64,7 +67,6 @@ async function processVideo(fileDoc) {
 }
 
 function generateAudio(filePath) {
-  const temptDir = path.join(require.main?.path || process.cwd(), "temp");
   const outputDir = path.join(temptDir, "processed_videos");
 
   const _id = path.basename(filePath, path.extname(filePath));
@@ -125,6 +127,154 @@ async function getTranscriptSegments(filePath) {
   return segments;
 }
 
+/**
+ * Helper function to extract and save a video segment.
+ */
+async function extractSegment(filePath, start, duration, outputFile) {
+  return new Promise((resolve, reject) => {
+    fluentFfmpeg(filePath)
+      .seekInput(start)
+      .duration(duration)
+      .videoCodec("libx264") // Re-encode video to H.264
+      .audioCodec("aac") // Re-encode audio to AAC
+      .size("1408x1872") // Standardize resolution
+      .fps(30) // Standardize frame rate
+      .output(outputFile)
+      .on("end", () => resolve("Segment extracted successfully"))
+      .on("error", (err) => reject(err))
+      .run();
+  });
+}
+
+/**
+ * Merges multiple video files into a single video file.
+ */
+async function mergeVideos(inputFiles, outputFile, onProgress = (p) => {}) {
+  return new Promise((resolve, reject) => {
+    const command = fluentFfmpeg();
+
+    // Add each input file
+    inputFiles.forEach((file) => {
+      command.input(file);
+    });
+
+    // Use the concat filter for merging
+    command
+      .on("error", (err) => reject(err))
+      .on("end", () => resolve("Videos merged successfully"))
+      .on("progress", (progress) => {
+        console.log(`Merging videos: ${progress.percent}%`);
+        onProgress(progress);
+      })
+      .mergeToFile(outputFile, path.dirname(outputFile));
+  });
+}
+
+/**
+ * Defines the type for a segment object.
+ *
+ * @typedef {Object} Segment
+ * @property {string} fileId - The ID of the video the segment belongs to.
+ * @property {string} id - A unique identifier for the segment.
+ * @property {number} start - The start time of the segment in the video.
+ * @property {number} end - The end time of the segment in the video.
+ * @property {number} duration - The duration of the segment, calculated as end - start.
+ * @property {string} text - The text associated with the segment.
+ */
+/**
+ * Exports video segments based on the provided video IDs and segment details.
+ *
+ * @param {string[]} fileId - An array of file IDs to be processed.
+ * @param {Segment[]} segments - An array of segment objects.
+ * @returns {Promise<any>}
+ */
+async function exportVideoBySegments(
+  fileId = [],
+  segments = [],
+  onProgress = (progress) => {}
+) {
+  console.log(
+    `Exporting video from ${segments.length} segments from ${fileId.length} files.`
+  );
+
+  const total_duration = segments.reduce(
+    (acc, segment) => acc + segment.duration,
+    0
+  );
+
+  console.log(`Total duration of segments: ${total_duration} seconds`);
+
+  const filePaths = {};
+  const intermediateFiles = [];
+  const export_dir = path.join(temptDir, "exported_videos");
+  await createFolder(export_dir);
+  const timestamp = Date.now();
+  const outputFilePath = path.join(export_dir, `${timestamp}.mp4`);
+
+  // Get file paths for each video ID
+  for (const id of fileId) {
+    filePaths[id] = await getFilePath(id);
+  }
+
+  // Extract segments
+  for (const segment of segments) {
+    const { fileId, start, duration } = segment;
+    const filePath = filePaths[fileId];
+    const outputFile = path.join(
+      export_dir,
+      `segment-${timestamp}-${segment.id}.mp4`
+    );
+    await extractSegment(filePath, start, duration, outputFile);
+    intermediateFiles.push(outputFile);
+  }
+
+  // Merge segments
+  return mergeVideos(intermediateFiles, outputFilePath, onProgress)
+    .then(() => {
+      console.log("Video segments merged successfully");
+      return getFileInformation(outputFilePath);
+    })
+    .catch((err) => {
+      console.error(`Error merging videos: ${err.message}`);
+      try {
+        fs.unlinkSync(outputFilePath);
+      } catch (error) {}
+      return "";
+    })
+    .finally(() => {
+      // Optionally, clean up intermediate files
+      intermediateFiles.forEach((file) => fs.unlinkSync(file));
+    });
+}
+
+function getFileInformation(filePath) {
+  return new Promise((resolve, reject) => {
+    // Getting file size
+    const fileSize = fs.statSync(filePath).size;
+
+    // Extracting file name
+    const fileName = path.basename(filePath);
+
+    // Using fluent-ffmpeg to determine the file type
+    fluentFfmpeg.ffprobe(filePath, (err, metadata) => {
+      if (err) {
+        reject(err);
+      } else {
+        // Assuming the first stream is representative for the file type
+        const fileType = metadata.streams[0].codec_type;
+        // Constructing the file info object
+        const fileInfo = {
+          path: filePath,
+          type: fileType, // This is not a MIME type, but a codec type. Adjust as needed.
+          name: fileName,
+          size: fileSize,
+        };
+        resolve(fileInfo);
+      }
+    });
+  });
+}
 module.exports = {
   processVideo,
+  exportVideoBySegments,
 };

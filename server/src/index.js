@@ -1,10 +1,5 @@
 const fs = require("fs");
-const {
-  createRest,
-  DatabaseTrigger,
-  getCollection,
-  CmsTrigger,
-} = require("@modular-rest/server");
+const { createRest } = require("@modular-rest/server");
 
 const permissionGroups = require("./permissions").permissionGroups;
 

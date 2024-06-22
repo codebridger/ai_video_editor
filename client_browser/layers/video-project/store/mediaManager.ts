@@ -1,4 +1,4 @@
-import { fileProvider, Types } from "@modular-rest/client";
+import { fileProvider, Types, functionProvider } from "@modular-rest/client";
 import { defineStore } from "pinia";
 
 export const useMediaManagerStore = defineStore("mediaManagerStore", () => {
@@ -71,6 +71,18 @@ export const useMediaManagerStore = defineStore("mediaManagerStore", () => {
     });
   }
 
+  function generateVideoRevision(context: { prompt: string; ids: string[] }) {
+    debugger;
+    return functionProvider.run({
+      name: "generateVideoRevision",
+      args: {
+        prompt: context.prompt,
+        mediaVideoIds: context.ids,
+        userId: authUser.value?.id,
+      },
+    });
+  }
+
   return {
     projectFiles,
     uploadList,
@@ -78,5 +90,6 @@ export const useMediaManagerStore = defineStore("mediaManagerStore", () => {
     checkUploadProgress,
     fetchProjectFiles,
     removeProjectFile,
+    generateVideoRevision,
   };
 });

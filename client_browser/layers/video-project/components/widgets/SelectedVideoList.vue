@@ -6,6 +6,7 @@
       :class="[
         'absolute h-32 w-full flex justify-center items-center',
         'dark:text-muted-400 text-gray-400',
+        'overflow-auto',
       ]"
     >
       <span>Drop files here</span>
@@ -49,6 +50,7 @@ const componentKey = ref(0);
 
 function onDrop() {
   componentKey.value++;
+  emit("update:modelValue", tempFiles.value);
 }
 
 function onRemove(fileId: string) {

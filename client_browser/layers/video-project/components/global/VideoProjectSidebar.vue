@@ -5,6 +5,7 @@
     :class="[
       'p-1 h-1/2 border-solid border-y-2 border-y-gray-200 dark:border-muted-700',
       'flex flex-wrap content-start',
+      'overflow-auto',
     ]"
     :group="{ name: 'projectFiles', pull: 'clone', put: false }"
     v-model="mediaManagerStore.projectFiles"
