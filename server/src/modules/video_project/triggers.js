@@ -15,10 +15,7 @@ module.exports.projectFileTriggers = [
   }),
 
   new CmsTrigger("remove-one", async ({ query, queryResult }) => {
-    getCollection(
-      VIDEO_PROJECT.DATABASE,
-      VIDEO_PROJECT.TRANSCRIPT_SEGMENT_COLLECTION
-    )
+    getCollection(VIDEO_PROJECT.DATABASE, VIDEO_PROJECT.VIDEO_MEDIA)
       .deleteOne({ fileId: query._id })
       .exec();
   }),

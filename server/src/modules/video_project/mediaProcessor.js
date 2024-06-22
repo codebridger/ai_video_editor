@@ -20,24 +20,47 @@ function createFolder(folderPath) {
 async function processVideo(fileDoc) {
   const { _id, originalName, fileName, owner, format, tag, size } = fileDoc;
 
-  const filePath = await getFilePath(_id.toString());
-  const outputFile = await generateAudio(filePath);
+  const id = _id.toString();
+  let segments = [];
+  let formatProp = {};
+  let isProcessed = false;
 
-  const segments = await getTranscriptSegments(outputFile);
-  fs.unlinkSync(outputFile);
+  try {
+    const filePath = await getFilePath(id);
 
-  // Save the segments to the database
+    // Generate audio from the video
+    const outputFile = await generateAudio(filePath);
+
+    // Get the transcript segments
+    segments = await getTranscriptSegments(outputFile);
+    fs.unlinkSync(outputFile);
+
+    // Get format properties
+    formatProp = await getFormatProperties(filePath);
+    isProcessed = true;
+  } catch (error) {
+    console.error("Error processing video " + id, error);
+    isProcessed = false;
+  }
+
   const model = getCollection(
     VIDEO_PROJECT.DATABASE,
-    VIDEO_PROJECT.TRANSCRIPT_SEGMENT_COLLECTION
+    VIDEO_PROJECT.VIDEO_MEDIA
   );
 
-  await model.insertMany([
-    {
-      fileId: _id.toString(),
-      segments,
-    },
-  ]);
+  // Save the processed video
+  await model
+    .insertMany([
+      {
+        fileId: id,
+        format: formatProp,
+        isProcessed,
+        segments,
+      },
+    ])
+    .finally(() => {
+      console.log("Video processed successfully" + id);
+    });
 }
 
 function generateAudio(filePath) {
@@ -57,17 +80,28 @@ function generateAudio(filePath) {
       .audioCodec("libmp3lame")
       // .output(outputFile)
       .on("error", (err) => {
-        console.error(`Error processing video: ${err.message}`);
+        console.error(`video convert error: ${err.message}`);
         reject(err);
       })
       .on("progress", (progress) => {
-        console.log(`Processing video: ${progress.percent}%`);
+        // console.log(`Processing video: ${progress.percent}%`);
       })
       .on("end", () => {
-        console.log("Done");
         resolve(outputFile);
       })
       .saveToFile(outputFile);
+  });
+}
+
+function getFormatProperties(filePath) {
+  return new Promise(async (resolve, reject) => {
+    fluentFfmpeg.ffprobe(filePath, (err, { format = {} }) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(format);
+      }
+    });
   });
 }
 

@@ -48,7 +48,6 @@ const tempFiles = ref<Types.FileDocument[]>([]);
 const componentKey = ref(0);
 
 function onDrop() {
-  console.log(tempFiles);
   componentKey.value++;
 }
 

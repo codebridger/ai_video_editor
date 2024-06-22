@@ -30,10 +30,19 @@ const projectCollection = new CollectionDefinition({
 
 const transcriptSegmentCollection = new CollectionDefinition({
   db: VIDEO_PROJECT.DATABASE,
-  collection: VIDEO_PROJECT.TRANSCRIPT_SEGMENT_COLLECTION,
+  collection: VIDEO_PROJECT.VIDEO_MEDIA,
   schema: new Schema(
     {
       fileId: String,
+      isProcessed: Boolean,
+      // Format properties:
+      // https://github.com/fluent-ffmpeg/node-fluent-ffmpeg?tab=readme-ov-file#reading-video-metadata
+      format: {
+        type: Object,
+        default: {},
+      },
+      // Segments:
+      // https://platform.openai.com/docs/api-reference/audio/createTranscription
       segments: [
         {
           start: Number,

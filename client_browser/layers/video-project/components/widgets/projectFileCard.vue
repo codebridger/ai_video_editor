@@ -86,7 +86,7 @@ const props = defineProps({
 const removeModal = ref(false);
 
 function onRemoveClick() {
-  if (props.confirmRemove == false) {
+  if (props.confirmRemove == true) {
     removeModal.value = true;
   } else {
     emit("remove", props.file._id);

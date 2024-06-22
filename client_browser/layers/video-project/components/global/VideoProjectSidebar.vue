@@ -14,7 +14,7 @@
       <WidgetsProjectFileCard
         :file="element"
         @remove="mediaManagerStore.removeProjectFile"
-        confirm-remove
+        :confirm-remove="true"
       />
     </template>
   </draggable>

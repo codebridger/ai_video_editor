@@ -40,7 +40,6 @@ function startUpload() {
         <img
           v-if="props.file.type.startsWith('image')"
           class="size-14 rounded-xl object-cover object-center"
-          :src="preview(props.file).value"
           alt="Image preview"
         />
 

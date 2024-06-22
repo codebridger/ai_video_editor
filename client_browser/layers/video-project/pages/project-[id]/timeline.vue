@@ -4,6 +4,7 @@
       title="Selected videos for timeline"
       v-model="files"
     />
+    <WidgetsPromptBox class="my-4" title="Prompt to generate video" />
   </div>
 </template>
 
