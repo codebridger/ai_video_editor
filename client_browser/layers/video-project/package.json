@@ -11,6 +11,7 @@
     "nuxt": "3.11.2",
     "pinia": "^2.1.7",
     "vee-validate": "^4.13.1",
+    "vuedraggable": "^4.1.0",
     "yup": "^1.4.0"
   },
   "devDependencies": {

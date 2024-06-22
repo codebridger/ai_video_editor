@@ -1,12 +1,21 @@
 <template>
-  <div class="container">TimeLine</div>
+  <div class="container">
+    <WidgetsSelectedVideoList
+      title="Selected videos for timeline"
+      v-model="files"
+    />
+  </div>
 </template>
 
 <script setup lang="ts">
+import { Types } from "@modular-rest/client";
+
 definePageMeta({
   layout: "project",
 });
 
 const route = useRoute();
 const id = computed(() => route.params.id?.toString() || "");
+
+const files = ref<Types.FileDocument[]>([]);
 </script>

@@ -63,12 +63,11 @@ export const useMediaManagerStore = defineStore("mediaManagerStore", () => {
       });
   }
 
-  function removeProjectFile(file: Types.FileDocument) {
-    return fileProvider.removeFile(file._id).then(() => {
-      const index = projectFiles.value.indexOf(file);
-      if (index > -1) {
-        projectFiles.value.splice(index, 1);
-      }
+  function removeProjectFile(fileId: string) {
+    return fileProvider.removeFile(fileId).then(() => {
+      projectFiles.value = projectFiles.value.filter(
+        (file) => file._id !== fileId
+      );
     });
   }
 

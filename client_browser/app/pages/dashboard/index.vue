@@ -34,7 +34,7 @@ onMounted(() => {
 
     <template #default>
       <div class="flex flex-col space-y-2" v-if="!projectsStore.isLoading">
-        <TransitionGroup
+        <!-- <TransitionGroup
           mode="out-in"
           enter-active-class="transition-opacity duration-500"
           enter-from-class="opacity-0"
@@ -42,35 +42,32 @@ onMounted(() => {
           leave-active-class="transition-opacity duration-500"
           leave-from-class="opacity-100"
           leave-to-class="opacity-0"
-        >
-          <template
-            v-for="project of projectsStore.projects"
-            :key="project._id"
+        > -->
+        <template v-for="project of projectsStore.projects" :key="project._id">
+          <BaseCard
+            @mouseenter="setupSidebarLayout(project._id)"
+            class="w-full py-6 px-8 flex justify-between items-center"
+            shadow="hover"
           >
-            <BaseCard
-              @mouseenter="setupSidebarLayout(project._id)"
-              class="w-full py-6 px-8 flex justify-between items-center"
-              shadow="hover"
-            >
-              <span>
-                {{ project.title }}
-              </span>
+            <span>
+              {{ project.title }}
+            </span>
 
-              <div class="flex space-x-2">
-                <BaseButton :to="'/project-' + project._id + '/timeline'">{{
-                  $t("edit")
-                }}</BaseButton>
+            <div class="flex space-x-2">
+              <BaseButton :to="'/project-' + project._id + '/timeline'">{{
+                $t("edit")
+              }}</BaseButton>
 
-                <BaseButtonIcon
-                  @click="projectsStore.removeById(project._id)"
-                  color="primary"
-                >
-                  <Icon name="i-solar-trash-bin-2-broken" />
-                </BaseButtonIcon>
-              </div>
-            </BaseCard>
-          </template>
-        </TransitionGroup>
+              <BaseButtonIcon
+                @click="projectsStore.removeById(project._id)"
+                color="primary"
+              >
+                <Icon name="i-solar-trash-bin-2-broken" />
+              </BaseButtonIcon>
+            </div>
+          </BaseCard>
+        </template>
+        <!-- </TransitionGroup> -->
       </div>
 
       <BasePagination

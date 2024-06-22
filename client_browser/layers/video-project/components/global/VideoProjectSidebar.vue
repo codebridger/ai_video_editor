@@ -1,17 +1,23 @@
 <template>
-  <div
+  <BaseHeading class="mx-4 my-2"> Uploaded Videos </BaseHeading>
+
+  <draggable
     :class="[
-      'p-1 h-1/2 border-solid border-b-2 border-b-gray-200 dark:border-muted-700',
+      'p-1 h-1/2 border-solid border-y-2 border-y-gray-200 dark:border-muted-700',
       'flex flex-wrap content-start',
     ]"
+    :group="{ name: 'projectFiles', pull: 'clone', put: false }"
+    v-model="mediaManagerStore.projectFiles"
+    item-key="fileName"
   >
-    <template
-      v-for="projectFile in mediaManagerStore.projectFiles"
-      :key="projectFile._id"
-    >
-      <WidgetsProjectFileCard :file="projectFile" />
+    <template #item="{ element, index }">
+      <WidgetsProjectFileCard
+        :file="element"
+        @remove="mediaManagerStore.removeProjectFile"
+        confirm-remove
+      />
     </template>
-  </div>
+  </draggable>
 
   <div class="p-4">
     <BaseFullscreenDropfile
@@ -116,6 +122,7 @@
 
 <script setup lang="ts">
 import { useMediaManagerStore } from "../../store/mediaManager";
+import draggable from "vuedraggable";
 
 const mediaManagerStore = useMediaManagerStore();
 </script>
