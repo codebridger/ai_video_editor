@@ -9,6 +9,12 @@ const { VIDEO_PROJECT } = require("../../config");
 const { number } = require("zod");
 const { projectDocTriggers } = require("./triggers");
 
+const groupedSegmentsSchema = new Schema({
+  ids: [Number],
+  description: String,
+  duration: Number,
+});
+
 const projectCollection = new CollectionDefinition({
   db: VIDEO_PROJECT.DATABASE,
   collection: VIDEO_PROJECT.PROJECT_COLLECTION,
@@ -16,6 +22,7 @@ const projectCollection = new CollectionDefinition({
     {
       title: String,
       userId: String,
+      timeline: [groupedSegmentsSchema],
     },
     { timestamps: true }
   ),
@@ -58,13 +65,7 @@ const videoMedia = new CollectionDefinition({
         },
       ],
       // grouped segments based on their context.
-      groupedSegments: [
-        {
-          ids: [Number],
-          description: String,
-          duration: Number,
-        },
-      ],
+      groupedSegments: [groupedSegmentsSchema],
     },
     { timestamps: true }
   ),

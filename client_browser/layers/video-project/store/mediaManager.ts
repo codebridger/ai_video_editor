@@ -7,10 +7,14 @@ import {
 import { defineStore } from "pinia";
 import {
   VIDEO_PROJECT_DATABASE,
+  type GroupedSegment,
+  type ProjectType,
   type VideoMediaType,
 } from "../types/project.type";
 
 export const useMediaManagerStore = defineStore("mediaManagerStore", () => {
+  const projectId = ref<string>("");
+
   // The uploaded files for the project, Native cms files
   const projectFiles = ref<Types.FileDocument[]>([]);
   // The files are bing uploaded by the user
@@ -21,6 +25,31 @@ export const useMediaManagerStore = defineStore("mediaManagerStore", () => {
   // ProjectMedia Files
   // These are process content of cms files
   const processedVideoMediaList = ref<VideoMediaType[]>([]);
+
+  const timeLine = ref<GroupedSegment[]>([]);
+
+  function initialize(id: string) {
+    projectId.value = id;
+
+    fetchProjectTimeLine(id);
+    fetchProjectFiles(id);
+    fetchVideoMedias(id);
+  }
+
+  function fetchProjectTimeLine(id: string) {
+    return dataProvider
+      .findOne<ProjectType>({
+        database: VIDEO_PROJECT_DATABASE.DATABASE,
+        collection: VIDEO_PROJECT_DATABASE.PROJECT_COLLECTION,
+        query: {
+          userId: authUser.value?.id,
+          _id: id,
+        },
+      })
+      .then((project) => {
+        timeLine.value = project.timeline;
+      });
+  }
 
   function fetchProjectFiles(projectId: string) {
     projectFiles.value = [];
@@ -158,10 +187,28 @@ export const useMediaManagerStore = defineStore("mediaManagerStore", () => {
       });
   }
 
+  function updateProjectTimeLine() {
+    return dataProvider.updateOne({
+      database: VIDEO_PROJECT_DATABASE.DATABASE,
+      collection: VIDEO_PROJECT_DATABASE.PROJECT_COLLECTION,
+      query: {
+        userId: authUser.value?.id,
+        _id: projectId.value,
+      },
+      update: {
+        $set: {
+          timeline: timeLine.value,
+        },
+      },
+    });
+  }
+
   return {
     projectFiles,
     uploadList,
     processedVideoMediaList,
+    timeLine,
+    initialize,
     startUploadSession,
     checkUploadProgress,
     fetchProjectFiles,
@@ -170,5 +217,6 @@ export const useMediaManagerStore = defineStore("mediaManagerStore", () => {
     fetchVideoMedias,
     fetchVideoMediaByFileId,
     generateGroupedSegments,
+    updateProjectTimeLine,
   };
 });

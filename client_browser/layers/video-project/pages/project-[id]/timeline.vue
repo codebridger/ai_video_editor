@@ -7,9 +7,10 @@
       @generate="generateVideo"
     />
 
-    <WidgetsSelectedVideoList
+    <WidgetsProjectTimeline
       title="Selected videos for timeline"
-      v-model="files"
+      v-model="mediaManager.timeLine"
+      @update:modelValue="mediaManager.updateProjectTimeLine"
     />
   </div>
 </template>
@@ -17,25 +18,19 @@
 <script setup lang="ts">
 import { Types } from "@modular-rest/client";
 import { useMediaManagerStore } from "../../store/mediaManager";
+import type { GroupedSegment } from "../../types/project.type";
 const mediaManager = useMediaManagerStore();
 
 definePageMeta({
   layout: "project",
 });
 
-const route = useRoute();
-const id = computed(() => route.params.id?.toString() || "");
-
-const files = ref<Types.FileDocument[]>([]);
 const prompt = ref("Generate a 60 second video for Instagram reels.");
-const segments = ref<
-  { start: number; end: number; text: string; videoId: string }[]
->([]);
 
 function generateVideo() {
-  mediaManager.generateVideoRevision({
-    prompt: prompt.value,
-    ids: files.value.map((file) => file._id),
-  });
+  // mediaManager.generateVideoRevision({
+  //   prompt: prompt.value,
+  //   ids: timeline.value.map((file) => file._id),
+  // });
 }
 </script>
