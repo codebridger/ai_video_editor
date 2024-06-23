@@ -1,6 +1,11 @@
 <template>
   <section class="relative">
-    <BaseHeading class="mx-4 my-2"> {{ title }} </BaseHeading>
+    <div class="flex justify-between">
+      <BaseHeading class="mx-4 my-2"> {{ title }} </BaseHeading>
+      <span class="text-gray-500 dark:bg-muted-600"
+        >Duration: {{ totalDuration }}s</span
+      >
+    </div>
     <div
       v-if="tempFiles.length === 0"
       :class="[
@@ -15,38 +20,47 @@
       :key="componentKey"
       :class="[
         'p-1 border-solid rounded border-[1px] border-gray-200 dark:border-muted-700',
-        'flex flex-wrap content-start',
+        'flex content-start',
         'min-h-32',
       ]"
       v-model="tempFiles"
-      :group="'projectFiles'"
-      item-key="fileName"
+      :group="'grouped-segments'"
+      item-key="_id"
       @change="onDrop"
     >
-      <template #item="{ element, index }">
-        <WidgetsProjectFileCard
-          :file="element"
-          @remove="onRemove"
-          confirm-remove
-        />
+      <template
+        #item="{ element, index }: { element: GroupedSegment, index: number }"
+      >
+        <BaseCard class="p-1 w-52">
+          <p class="text-sm" :dir="isRTL('persian') ? 'rtl' : 'ltr'">
+            {{ element.description }}
+          </p>
+        </BaseCard>
       </template>
     </draggable>
   </section>
 </template>
 
 <script setup lang="ts">
-import { Types } from "@modular-rest/client";
 import draggable from "vuedraggable";
+import type { GroupedSegment } from "../../types/project.type";
+import { isRTL } from "../../helpers/languages";
 
 const props = defineProps({
   title: String,
-  modelValue: Array as PropType<Types.FileDocument[]>,
+  modelValue: Array as PropType<GroupedSegment[]>,
 });
 
-const emit = defineEmits<{ "update:modelValue": [Types.FileDocument[]] }>();
+const emit = defineEmits<{ "update:modelValue": [GroupedSegment[]] }>();
 
-const tempFiles = ref<Types.FileDocument[]>([]);
+const tempFiles = ref<GroupedSegment[]>([]);
 const componentKey = ref(0);
+
+const totalDuration = computed(() => {
+  return Math.floor(
+    tempFiles.value.reduce((acc, file) => acc + file.duration, 0)
+  );
+});
 
 function onDrop() {
   componentKey.value++;

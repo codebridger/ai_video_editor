@@ -15,6 +15,7 @@ async function processVideo(fileDoc) {
   const { _id, originalName, fileName, owner, format, tag, size } = fileDoc;
 
   const id = _id.toString();
+  let language = "";
   let segments = [];
   let groupedSegments = [];
   let formatProp = {};
@@ -40,9 +41,13 @@ async function processVideo(fileDoc) {
 
     // Get the transcript segments
     segments = await getTranscriptSegments(outputFile)
-      .then((segments) =>
-        segments.map((segment, index) => ({ ...segment, id: index }))
-      )
+      .then((res) => {
+        language = res.language;
+        return res.segments.map((segment, index) => ({
+          ...segment,
+          id: index,
+        }));
+      })
       .finally(() => {
         safeUnlink(outputFile);
       });
@@ -69,6 +74,7 @@ async function processVideo(fileDoc) {
         format: formatProp,
         isProcessed,
         segments,
+        language,
         groupedSegments,
       }
     )
@@ -126,7 +132,7 @@ async function getTranscriptSegments(filePath) {
   const transcription = await openai.audio.transcriptions.create({
     file: fs.createReadStream(filePath),
     model: "whisper-1",
-    language: "fa",
+    // language: "fa",
     response_format: "verbose_json",
     timestamp_granularities: ["segment"],
     temperature: 0.0,
@@ -135,10 +141,18 @@ async function getTranscriptSegments(filePath) {
 
   // @ts-ignore
   const segments = transcription.segments.map(({ start, end, text }) => {
-    return { start, end, text };
+    return {
+      start,
+      end,
+      text,
+    };
   });
 
-  return segments;
+  return {
+    segments,
+    // @ts-ignore
+    language: transcription.language,
+  };
 }
 
 async function extractGroupedSegments(segments) {
@@ -155,14 +169,20 @@ async function extractGroupedSegments(segments) {
     // generate group description
     for (const group of groupedSegments) {
       const lines = group.ids.map((id) => segments[id].text);
+      const duration = group.ids.reduce(
+        (acc, id) => acc + (segments[id].end - segments[id].start),
+        0
+      );
       const description = await contextChain.extractGroupDescription(lines);
       group["description"] = description;
+      group["duration"] = duration;
       await sleep(100);
     }
   } else {
     groupedSegments = [
       {
         ids: [0],
+        duration: segments[0].end - segments[0].start,
         description: segments[0].text || "No description available",
       },
     ];

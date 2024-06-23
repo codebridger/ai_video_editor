@@ -1,15 +1,15 @@
 <template>
   <div class="container">
-    <WidgetsSelectedVideoList
-      title="Selected videos for timeline"
-      v-model="files"
-    />
-
     <WidgetsPromptBox
       class="my-4"
       title="Prompt to generate video"
       v-model="prompt"
       @generate="generateVideo"
+    />
+
+    <WidgetsSelectedVideoList
+      title="Selected videos for timeline"
+      v-model="files"
     />
   </div>
 </template>

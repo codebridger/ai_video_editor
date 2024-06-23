@@ -1,5 +1,3 @@
-import { Types } from "@modular-rest/client";
-
 export const VIDEO_PROJECT_DATABASE = {
   DATABASE: "video_project",
   PROJECT_COLLECTION: "project",
@@ -14,6 +12,7 @@ export type ProjectType = {
 };
 
 export type Segment = {
+  _id: string;
   id: number;
   start: number;
   end: number;
@@ -21,7 +20,9 @@ export type Segment = {
 };
 
 export type GroupedSegment = {
+  _id: string;
   ids: number[];
+  duration: number;
   description: string;
 };
 
@@ -31,6 +32,7 @@ export type VideoMediaType = {
   fileName: string;
   projectId: string;
   isProcessed: boolean;
+  language: string;
   format: object; // Consider defining a more specific type if the format structure is known
   segments: Segment[];
   groupedSegments: GroupedSegment[];

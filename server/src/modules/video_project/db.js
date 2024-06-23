@@ -40,6 +40,7 @@ const videoMedia = new CollectionDefinition({
       fileName: String,
       projectId: String,
       isProcessed: Boolean,
+      language: String,
       // Format properties:
       // https://github.com/fluent-ffmpeg/node-fluent-ffmpeg?tab=readme-ov-file#reading-video-metadata
       format: {
@@ -61,6 +62,7 @@ const videoMedia = new CollectionDefinition({
         {
           ids: [Number],
           description: String,
+          duration: Number,
         },
       ],
     },

@@ -25,22 +25,44 @@
       <BasePlaceload class="h-4 w-[85%] rounded" />
     </div>
 
-    <section class="p-4 flex flex-col space-y-1" :key="key" v-else>
+    <draggable
+      v-else
+      class="p-4 flex flex-col space-y-1"
+      :key="key"
+      :list="media.groupedSegments"
+      :group="'grouped-segments'"
+      item-key="_id"
+    >
+      <template
+        #item="{ element, index }: { element: GroupedSegment, index: number }"
+      >
+        <BaseCard class="p-1">
+          <p class="text-sm" :dir="isRTL(media.language) ? 'rtl' : 'ltr'">
+            {{ element.description }}
+          </p>
+        </BaseCard>
+      </template>
+    </draggable>
+
+    <!-- <section class="p-4 flex flex-col space-y-1" :key="key" v-else>
       <BaseCard
         class="p-1"
         v-for="(group, i) in media.groupedSegments || []"
         :key="i"
       >
-        <p class="text-sm">{{ group.description }}</p>
+        <p class="text-sm" :dir="isRTL(media.language) ? 'rtl' : 'ltr'">
+          {{ group.description }}
+        </p>
       </BaseCard>
-    </section>
+    </section> -->
   </BaseCard>
 </template>
 
 <script setup lang="ts">
 import { useMediaManagerStore } from "../../store/mediaManager";
 import draggable from "vuedraggable";
-import type { VideoMediaType } from "../../types/project.type";
+import type { GroupedSegment, VideoMediaType } from "../../types/project.type";
+import { isRTL } from "../../helpers/languages";
 
 const mediaManagerStore = useMediaManagerStore();
 const props = defineProps<{
