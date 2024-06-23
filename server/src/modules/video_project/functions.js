@@ -1,6 +1,6 @@
 const { defineFunction, storeFile } = require("@modular-rest/server");
 const fs = require("fs");
-const videoRevisionChain = require("../../chains/video-editor-chain");
+const videoEditorCaptionBasedChain = require("../../chains/video-editor-caption-based");
 const {
   exportVideoBySegments,
   extractGroupedSegments,
@@ -12,8 +12,61 @@ const {
 
 const contextChain = require("../../chains/segment-grouper-chain");
 const { sleep } = require("../../helpers/promis");
+const timelineChain = require("../../chains/video-editor-grouped-segment-based");
 
 module.exports.functions = [
+  defineFunction({
+    name: "generateTimeline",
+    permissionTypes: ["user_access"],
+    callback: async ({ projectId, prompt, userId }) => {
+      if (!projectId) {
+        throw new Error("projectId is required.");
+      }
+
+      const { videoMediaModel, projectModel } = getVideoProjectModels();
+
+      const project = await projectModel
+        .findOne({
+          _id: projectId,
+          userId,
+        })
+        .exec();
+
+      if (!project) {
+        throw new Error("No project found with the given id");
+      }
+
+      const projectVideoMedia = await videoMediaModel
+        .find({ projectId })
+        .exec();
+
+      let groupedSegments = [];
+
+      for (const videoMedia of projectVideoMedia) {
+        if (!videoMedia || !videoMedia.groupedSegments) {
+          continue;
+        }
+
+        const videoMediaJson = videoMedia.toObject();
+
+        groupedSegments = groupedSegments.concat(
+          videoMediaJson.groupedSegments
+        );
+      }
+
+      const timeline = await timelineChain.invoke({
+        editing_request: prompt,
+        grouped_segments: groupedSegments,
+      });
+
+      await projectModel.updateOne({ _id: projectId }, { $set: { timeline } });
+
+      return {
+        timeline,
+      };
+    },
+  }),
+
   defineFunction({
     name: "generateVideoRevision",
     permissionTypes: ["user_access"],
@@ -63,14 +116,15 @@ module.exports.functions = [
       // Generate the video revision
       //
 
-      const revisionContainsSegmentIds = await videoRevisionChain.invoke({
-        editing_request: prompt,
-        caption_segments: segments.map((segment) => ({
-          id: segment.id,
-          duration: segment.duration,
-          text: segment.text,
-        })),
-      });
+      const revisionContainsSegmentIds =
+        await videoEditorCaptionBasedChain.invoke({
+          editing_request: prompt,
+          caption_segments: segments.map((segment) => ({
+            id: segment.id,
+            duration: segment.duration,
+            text: segment.text,
+          })),
+        });
 
       const newSegmentList = segments.filter((segment) =>
         revisionContainsSegmentIds.segment_ids.includes(segment.id)
@@ -145,6 +199,7 @@ module.exports.functions = [
         { _id: videoMediaId },
         {
           groupedSegments,
+          isProcessed: true,
         }
       );
 

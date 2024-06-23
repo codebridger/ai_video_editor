@@ -162,21 +162,26 @@ async function extractGroupedSegments(segments) {
   if (segments.length > 1) {
     groupedSegments = await contextChain
       .extractGroupsBySegments({
-        caption_segments: segments.map(({ text, id }) => ({ text, id })),
+        caption_segments: segments,
       })
       .then(({ groups }) => groups);
 
     // generate group description
     for (const group of groupedSegments) {
-      const lines = group.ids.map((id) => segments[id].text);
+      group.ids = group.ids.filter((id) => segments[id] !== undefined);
+
+      const lines = group.ids.map((id) => {
+        return segments[id].text || "";
+      });
+
       const duration = group.ids.reduce(
         (acc, id) => acc + (segments[id].end - segments[id].start),
         0
       );
+
       const description = await contextChain.extractGroupDescription(lines);
       group["description"] = description;
       group["duration"] = duration;
-      await sleep(100);
     }
   } else {
     groupedSegments = [

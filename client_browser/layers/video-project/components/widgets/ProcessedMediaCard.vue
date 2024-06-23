@@ -36,10 +36,13 @@
       <template
         #item="{ element, index }: { element: GroupedSegment, index: number }"
       >
-        <BaseCard class="p-1">
-          <p class="text-sm" :dir="isRTL(media.language) ? 'rtl' : 'ltr'">
+        <BaseCard class="p-2 flex items-end justify-between">
+          <p class="text-sm select-none">
             {{ element.description }}
           </p>
+          <spam class="ml-1 text-muted-400 text-xs"
+            >{{ Math.floor(element.duration) }}s</spam
+          >
         </BaseCard>
       </template>
     </draggable>

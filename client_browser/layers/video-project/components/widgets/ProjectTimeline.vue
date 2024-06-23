@@ -1,11 +1,14 @@
 <template>
   <section class="relative">
-    <div class="flex justify-between">
-      <BaseHeading class="mx-4 my-2"> {{ title }} </BaseHeading>
+    <div class="flex justify-between items-center w-[400px]">
+      <BaseHeading size="md" class="mx-4 my-2 text-gray-600 dark:bg-muted-700">
+        {{ title }}
+      </BaseHeading>
       <span class="text-gray-500 dark:bg-muted-600"
         >Duration: {{ totalDuration }}s</span
       >
     </div>
+
     <div
       v-if="tempFiles.length === 0"
       :class="[
@@ -16,12 +19,13 @@
     >
       <span>Drop files here</span>
     </div>
+
     <draggable
       :key="componentKey"
       :class="[
         'p-1 border-solid rounded border-[1px] border-gray-200 dark:border-muted-700',
-        'flex content-start',
-        'min-h-32',
+        'overflow-y-auto',
+        'h-[650px] w-[400px]',
       ]"
       v-model="tempFiles"
       :group="'grouped-segments'"
@@ -31,7 +35,7 @@
       <template
         #item="{ element, index }: { element: GroupedSegment, index: number }"
       >
-        <BaseCard class="p-1 w-52">
+        <BaseCard class="p-1 w-96">
           <p class="text-sm" :dir="isRTL('persian') ? 'rtl' : 'ltr'">
             {{ element.description }}
           </p>
@@ -77,6 +81,7 @@ watch(
   () => props.modelValue,
   () => {
     tempFiles.value = props.modelValue || [];
+    componentKey.value++;
   },
   { immediate: true, deep: true }
 );

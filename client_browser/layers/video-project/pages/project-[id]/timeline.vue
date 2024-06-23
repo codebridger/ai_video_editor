@@ -4,12 +4,13 @@
       class="my-4"
       title="Prompt to generate video"
       v-model="prompt"
+      :loading="isPending"
       @generate="generateVideo"
     />
 
     <WidgetsProjectTimeline
-      title="Selected videos for timeline"
-      v-model="mediaManager.timeLine"
+      title="Clips Timeline"
+      v-model="mediaManager.timeline"
       @update:modelValue="mediaManager.updateProjectTimeLine"
     />
   </div>
@@ -26,11 +27,12 @@ definePageMeta({
 });
 
 const prompt = ref("Generate a 60 second video for Instagram reels.");
+const isPending = ref(false);
 
 function generateVideo() {
-  // mediaManager.generateVideoRevision({
-  //   prompt: prompt.value,
-  //   ids: timeline.value.map((file) => file._id),
-  // });
+  isPending.value = true;
+  mediaManager.generateTimeline(prompt.value).finally(() => {
+    isPending.value = false;
+  });
 }
 </script>

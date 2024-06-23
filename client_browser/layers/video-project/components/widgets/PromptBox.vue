@@ -11,8 +11,8 @@
       />
     </div>
 
-    <BaseButton @click="emit('generate', props.modelValue)">
-      Generate
+    <BaseButton @click="emit('generate', props.modelValue)" :loading="loading">
+      Generate Timeline
     </BaseButton>
   </section>
 </template>
@@ -20,6 +20,7 @@
 <script setup lang="ts">
 const props = defineProps({
   title: String,
+  loading: Boolean,
   modelValue: {
     type: String,
     default: "",

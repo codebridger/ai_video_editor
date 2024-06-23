@@ -31,6 +31,11 @@ const app = createRest({
   modulesPath: path.join(__dirname, "modules"),
   uploadDirectory: path.join(__dirname, "..", "uploads"),
   keypair: process.env.KEYPAIR ? getKeys() : undefined,
+  koaBodyOptions: {
+    formidable: {
+      maxFileSize: 1024 * 1024 * 1024,
+    },
+  },
   // staticPath: {
   //   rootDir: path.join(__dirname, "assets"),
   // },

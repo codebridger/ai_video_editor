@@ -26,7 +26,7 @@ export const useMediaManagerStore = defineStore("mediaManagerStore", () => {
   // These are process content of cms files
   const processedVideoMediaList = ref<VideoMediaType[]>([]);
 
-  const timeLine = ref<GroupedSegment[]>([]);
+  const timeline = ref<GroupedSegment[]>([]);
 
   function initialize(id: string) {
     projectId.value = id;
@@ -47,7 +47,7 @@ export const useMediaManagerStore = defineStore("mediaManagerStore", () => {
         },
       })
       .then((project) => {
-        timeLine.value = project.timeline;
+        timeline.value = project.timeline;
       });
   }
 
@@ -197,17 +197,32 @@ export const useMediaManagerStore = defineStore("mediaManagerStore", () => {
       },
       update: {
         $set: {
-          timeline: timeLine.value,
+          timeline: timeline.value,
         },
       },
     });
+  }
+
+  function generateTimeline(prompt: string) {
+    return functionProvider
+      .run({
+        name: "generateTimeline",
+        args: {
+          prompt,
+          userId: authUser.value?.id,
+          projectId: projectId.value,
+        },
+      })
+      .then((res: any) => {
+        timeline.value = res.timeline;
+      });
   }
 
   return {
     projectFiles,
     uploadList,
     processedVideoMediaList,
-    timeLine,
+    timeline,
     initialize,
     startUploadSession,
     checkUploadProgress,
@@ -218,5 +233,6 @@ export const useMediaManagerStore = defineStore("mediaManagerStore", () => {
     fetchVideoMediaByFileId,
     generateGroupedSegments,
     updateProjectTimeLine,
+    generateTimeline,
   };
 });
