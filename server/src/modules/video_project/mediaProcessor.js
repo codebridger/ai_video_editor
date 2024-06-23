@@ -6,7 +6,8 @@ const fs = require("fs");
 const { VIDEO_PROJECT } = require("../../config");
 const contextChain = require("../../chains/segment-grouper-chain");
 const { getVideoProjectModels } = require("./service");
-const { createFolder } = require("../../helpers/file");
+const { createFolder, safeUnlink } = require("../../helpers/file");
+const { sleep } = require("../../helpers/promis");
 
 const temptDir = path.join(require.main?.path || process.cwd(), "..", "temp");
 
@@ -18,6 +19,18 @@ async function processVideo(fileDoc) {
   let groupedSegments = [];
   let formatProp = {};
   let isProcessed = false;
+
+  const { videoMediaModel } = getVideoProjectModels();
+
+  const videoMediaDoc = await videoMediaModel.create({
+    fileId: id,
+    originalName,
+    projectId: tag,
+    format: formatProp,
+    isProcessed,
+    segments,
+    groupedSegments,
+  });
 
   try {
     const filePath = await getFilePath(id);
@@ -31,22 +44,11 @@ async function processVideo(fileDoc) {
         segments.map((segment, index) => ({ ...segment, id: index }))
       )
       .finally(() => {
-        fs.unlinkSync(outputFile);
+        safeUnlink(outputFile);
       });
 
     // get grouped segments
-    groupedSegments = await contextChain
-      .extractGroupsBySegments({
-        caption_segments: segments.map(({ text, id }) => ({ text, id })),
-      })
-      .then(({ groups }) => groups);
-
-    // generate group description
-    for (const group of groupedSegments) {
-      const lines = group.ids.map((id) => segments[id].text);
-      const description = await contextChain.extractGroupDescription(lines);
-      group["description"] = description;
-    }
+    groupedSegments = await extractGroupedSegments(segments);
 
     // Get format properties
     formatProp = await getFormatProperties(filePath);
@@ -56,18 +58,21 @@ async function processVideo(fileDoc) {
     isProcessed = false;
   }
 
-  const { videoMediaModel } = getVideoProjectModels();
-
   // Save the processed video
   await videoMediaModel
-    .create({
-      fileId: id,
-      projectId: tag,
-      format: formatProp,
-      isProcessed,
-      segments,
-      groupedSegments,
-    })
+    .updateOne(
+      { _id: videoMediaDoc._id },
+      {
+        fileId: id,
+        fileName,
+        projectId: tag,
+        format: formatProp,
+        isProcessed,
+        segments,
+        groupedSegments,
+      }
+    )
+    .exec()
     .finally(() => {
       console.log("Video processed successfully" + id);
     });
@@ -124,6 +129,8 @@ async function getTranscriptSegments(filePath) {
     language: "fa",
     response_format: "verbose_json",
     timestamp_granularities: ["segment"],
+    temperature: 0.0,
+    prompt: "if you cant find human voice, just describe the sound",
   });
 
   // @ts-ignore
@@ -132,6 +139,36 @@ async function getTranscriptSegments(filePath) {
   });
 
   return segments;
+}
+
+async function extractGroupedSegments(segments) {
+  let groupedSegments = [];
+
+  // get grouped segments
+  if (segments.length > 1) {
+    groupedSegments = await contextChain
+      .extractGroupsBySegments({
+        caption_segments: segments.map(({ text, id }) => ({ text, id })),
+      })
+      .then(({ groups }) => groups);
+
+    // generate group description
+    for (const group of groupedSegments) {
+      const lines = group.ids.map((id) => segments[id].text);
+      const description = await contextChain.extractGroupDescription(lines);
+      group["description"] = description;
+      await sleep(100);
+    }
+  } else {
+    groupedSegments = [
+      {
+        ids: [0],
+        description: segments[0].text || "No description available",
+      },
+    ];
+  }
+
+  return groupedSegments;
 }
 
 /**
@@ -244,13 +281,13 @@ async function exportVideoBySegments(
     .catch((err) => {
       console.error(`Error merging videos: ${err.message}`);
       try {
-        fs.unlinkSync(outputFilePath);
+        safeUnlink(outputFilePath);
       } catch (error) {}
       return "";
     })
     .finally(() => {
       // Optionally, clean up intermediate files
-      intermediateFiles.forEach((file) => fs.unlinkSync(file));
+      intermediateFiles.forEach((file) => safeUnlink(file));
     });
 }
 
@@ -284,4 +321,5 @@ function getFileInformation(filePath) {
 module.exports = {
   processVideo,
   exportVideoBySegments,
+  extractGroupedSegments,
 };

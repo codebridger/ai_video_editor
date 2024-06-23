@@ -12,6 +12,17 @@ function createFolder(folderPath) {
   });
 }
 
+function safeUnlink(filePath) {
+  try {
+    fs.unlink(filePath, (err) => {
+      if (err) {
+        // console.error("Error deleting file", err);
+      }
+    });
+  } catch (error) {}
+}
+
 module.exports = {
   createFolder,
+  safeUnlink,
 };

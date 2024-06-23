@@ -1,17 +1,31 @@
 <template>
-  <div class="w-full max-w-sm">
-    <BaseTabs justify="center" :tabs="tabs" v-model="activeTab" />
+  <div class="flex flex-col h-screen">
+    <div class="w-full max-w-sm">
+      <BaseTabs
+        :classes="{ inner: 'tabs-m-0' }"
+        justify="center"
+        :tabs="tabs"
+        v-model="activeTab"
+      />
+    </div>
+
+    <section class="flex-1 flex flex-col" v-if="activeTab === 'uploadMedia'">
+      <div class="h-[60vh] w-full">
+        <WidgetsUploadedMediaList />
+      </div>
+
+      <div class="p-4 overflow-y-auto">
+        <WidgetsUploadBox />
+      </div>
+    </section>
+
+    <section
+      class="h-[95hv] overflow-auto px-2"
+      v-else-if="activeTab === 'processedMedia'"
+    >
+      <WidgetsProcessedMediaList />
+    </section>
   </div>
-
-  <section v-if="activeTab === 'uploadMedia'">
-    <div class="p-2 h-1/2">
-      <WidgetsUploadedMedia />
-    </div>
-
-    <div class="p-4">
-      <WidgetsUploadBox />
-    </div>
-  </section>
 </template>
 
 <script setup lang="ts">
@@ -28,8 +42,15 @@ const tabs = [
   },
   {
     label: "Processed Media",
-    value: "scenes",
+    value: "processedMedia",
     icon: "mdi-light:filmstrip",
   },
 ];
 </script>
+
+<style scoped>
+/* How target down level styles */
+::v-deep .tabs-m-0 {
+  margin: 0 !important;
+}
+</style>

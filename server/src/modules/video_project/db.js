@@ -37,6 +37,7 @@ const videoMedia = new CollectionDefinition({
   schema: new Schema(
     {
       fileId: String,
+      fileName: String,
       projectId: String,
       isProcessed: Boolean,
       // Format properties:
@@ -65,7 +66,13 @@ const videoMedia = new CollectionDefinition({
     },
     { timestamps: true }
   ),
-  permissions: [],
+  permissions: [
+    new Permission({
+      type: "user_access",
+      read: true,
+      write: false,
+    }),
+  ],
 });
 
 const videoRevision = new CollectionDefinition({

@@ -27,6 +27,7 @@ function extractGroupsBySegments({ caption_segments }) {
         - Try to group given text list into meaningful groups. even if context is similar try to break it into different groups.
         - Return a list of groups, where each group is a list of segment IDs.
         - Ids start from 0.
+        - Don't add ids, only use the given ids.
 		  `,
     ],
     [
@@ -50,7 +51,10 @@ function extractGroupDescription(lines = []) {
     [
       "system",
       `
-        write a short description about below text in same language as the text (keep it short but informative):
+        write a short description about below Video Caption in same language as the text (keep it short but informative),
+        if text is too short like 1-5 words just return the exact text.
+
+        Video Captions:
         {lines}
       `,
     ],

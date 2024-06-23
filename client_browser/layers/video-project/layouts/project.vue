@@ -7,6 +7,7 @@ const route = useRoute();
 onMounted(() => {
   const projectId = route.params.id as string;
   mediaStore.fetchProjectFiles(projectId.toString());
+  mediaStore.fetchVideoMedias(projectId.toString());
 });
 </script>
 

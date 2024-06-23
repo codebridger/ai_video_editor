@@ -1,11 +1,17 @@
 const { defineFunction, storeFile } = require("@modular-rest/server");
 const fs = require("fs");
 const videoRevisionChain = require("../../chains/video-editor-chain");
-const { exportVideoBySegments } = require("./mediaProcessor");
+const {
+  exportVideoBySegments,
+  extractGroupedSegments,
+} = require("./mediaProcessor");
 const {
   getVideoMediaDocsByFileIds,
   getVideoProjectModels,
 } = require("./service");
+
+const contextChain = require("../../chains/segment-grouper-chain");
+const { sleep } = require("../../helpers/promis");
 
 module.exports.functions = [
   defineFunction({
@@ -73,7 +79,7 @@ module.exports.functions = [
       //
       // Save the video revision
       //
-      const { videoMediaModel } = getVideoProjectModels();
+      const { videoMediaModel, videoRevisionModel } = getVideoProjectModels();
 
       const newRevision = await videoMediaModel.create({
         userId,
@@ -99,7 +105,7 @@ module.exports.functions = [
             .then((savedFile) => savedFile._id.toString())
             .catch((error) => "");
 
-          videoRevision.findByIdAndUpdate(newRevision._id, {
+          videoRevisionModel.findByIdAndUpdate(newRevision._id, {
             isPending: false,
             exportedFileId: exportedFileId,
           });
@@ -108,6 +114,42 @@ module.exports.functions = [
 
       return {
         revisionId: newRevision._id.toString(),
+      };
+    },
+  }),
+
+  defineFunction({
+    name: "generateGroupedSegments",
+    permissionTypes: ["user_access"],
+    callback: async ({ videoMediaId }) => {
+      if (!videoMediaId) {
+        throw new Error("videoMediaId is required.");
+      }
+
+      const { videoMediaModel } = getVideoProjectModels();
+
+      const videoMedia = await videoMediaModel
+        .findById(videoMediaId)
+        .exec()
+        .then((doc) => doc.toObject());
+
+      if (!videoMedia) {
+        throw new Error("No video found with the given id");
+      }
+
+      const segments = videoMedia.segments;
+      const groupedSegments = await extractGroupedSegments(segments);
+
+      // update the video with the grouped segments
+      await videoMediaModel.findByIdAndUpdate(
+        { _id: videoMediaId },
+        {
+          groupedSegments,
+        }
+      );
+
+      return {
+        groupedSegments,
       };
     },
   }),
