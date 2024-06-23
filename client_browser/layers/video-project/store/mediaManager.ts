@@ -148,11 +148,26 @@ export const useMediaManagerStore = defineStore("mediaManagerStore", () => {
   }
 
   function removeProjectFile(fileId: string) {
-    return fileProvider.removeFile(fileId).then(() => {
-      projectFiles.value = projectFiles.value.filter(
-        (file) => file._id !== fileId
-      );
-    });
+    const videoMedia = processedVideoMediaList.value.find(
+      (media) => media.fileId === fileId
+    );
+
+    if (!videoMedia) return Promise.resolve();
+
+    return dataProvider
+      .removeOne({
+        database: VIDEO_PROJECT_DATABASE.DATABASE,
+        collection: VIDEO_PROJECT_DATABASE.VIDEO_MEDIA,
+        query: { _id: videoMedia?._id, fileId },
+      })
+      .then(() => {
+        processedVideoMediaList.value = processedVideoMediaList.value.filter(
+          (media) => media.fileId !== fileId
+        );
+        projectFiles.value = projectFiles.value.filter(
+          (file) => file._id !== fileId
+        );
+      });
   }
 
   function generateVideoRevision(context: { prompt: string; ids: string[] }) {

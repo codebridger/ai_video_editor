@@ -34,7 +34,10 @@ export type VideoMediaType = {
   projectId: string;
   isProcessed: boolean;
   language: string;
-  format: object; // Consider defining a more specific type if the format structure is known
+  format: {
+    size: string;
+    [key: string]: string;
+  }; // Consider defining a more specific type if the format structure is known
   segments: Segment[];
   groupedSegments: GroupedSegment[];
 };

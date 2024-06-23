@@ -45,18 +45,13 @@ module.exports.projectDocTriggers = [
 
 module.exports.videoMediaTriggers = [
   new DatabaseTrigger("remove-one", async ({ query, queryResult }) => {
-    // const id = query._id;
-    // const { videoMediaModel, videoRevisionModel } =
-    //   projectService.getVideoProjectModels();
-    // // Remove all files
-    // await videoMediaModel
-    //   .findById(id)
-    //   .exec()
-    //   .then((mediaFile) => {
-    //     removeFile(mediaFile.fileId).catch((err) => {});
-    //   });
-    // // Remove all media files
-    // await videoMediaModel.deleteOne({ projectId: id }).exec();
+    const { _id, fileId } = query;
+
+    const { videoMediaModel, videoRevisionModel } =
+      projectService.getVideoProjectModels();
+
+    // Remove all files
+    removeFile(fileId).catch((err) => {});
   }),
 ];
 

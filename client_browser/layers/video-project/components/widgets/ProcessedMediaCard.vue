@@ -1,9 +1,14 @@
 <template>
   <BaseCard>
     <div class="flex justify-between">
-      <BaseHeading size="sm" class="text-gray-600 dark:text-muted-700 p-2">
-        {{ media.fileName || media.fileId }}
-      </BaseHeading>
+      <div class="flex items-center space-x-2">
+        <BaseHeading size="sm" class="text-gray-600 dark:text-muted-700 p-2">
+          {{ media.fileName || media.fileId }}
+        </BaseHeading>
+        <span class="text-sm text-gray-600">{{
+          ffmpegProps.width + "x" + ffmpegProps.height
+        }}</span>
+      </div>
 
       <div>
         <BaseButtonIcon
@@ -46,24 +51,13 @@
         </BaseCard>
       </template>
     </draggable>
-
-    <!-- <section class="p-4 flex flex-col space-y-1" :key="key" v-else>
-      <BaseCard
-        class="p-1"
-        v-for="(group, i) in media.groupedSegments || []"
-        :key="i"
-      >
-        <p class="text-sm" :dir="isRTL(media.language) ? 'rtl' : 'ltr'">
-          {{ group.description }}
-        </p>
-      </BaseCard>
-    </section> -->
   </BaseCard>
 </template>
 
 <script setup lang="ts">
-import { useMediaManagerStore } from "../../store/mediaManager";
 import draggable from "vuedraggable";
+import { functionProvider } from "@modular-rest/client";
+import { useMediaManagerStore } from "../../store/mediaManager";
 import type { GroupedSegment, VideoMediaType } from "../../types/project.type";
 import { isRTL } from "../../helpers/languages";
 
@@ -75,10 +69,20 @@ const props = defineProps<{
 const isPending = ref(false);
 const key = ref(Date.now());
 
+const ffmpegProps = ref<{
+  width: number;
+  height: number;
+}>({
+  width: 0,
+  height: 0,
+});
+
 onMounted(() => {
   if (!props.media.isProcessed) {
     checkIfProcessed();
   }
+
+  fetchFfmpegProps();
 });
 
 function generateGroupedSegments() {
@@ -99,5 +103,19 @@ async function checkIfProcessed() {
     await sleep(5000);
     mediaManagerStore.fetchVideoMediaByFileId(props.media.fileId);
   }
+}
+
+function fetchFfmpegProps() {
+  return functionProvider
+    .run({
+      name: "getFfmpegProps",
+      args: { fileId: props.media.fileId },
+    })
+    .then((res) => {
+      ffmpegProps.value = {
+        width: res.streams[0].width,
+        height: res.streams[0].height,
+      };
+    });
 }
 </script>

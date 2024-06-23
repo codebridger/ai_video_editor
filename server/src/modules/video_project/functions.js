@@ -1,4 +1,8 @@
-const { defineFunction, storeFile } = require("@modular-rest/server");
+const {
+  defineFunction,
+  storeFile,
+  getFilePath,
+} = require("@modular-rest/server");
 const fs = require("fs");
 const videoEditorCaptionBasedChain = require("../../chains/video-editor-caption-based");
 const {
@@ -15,6 +19,8 @@ const { sleep } = require("../../helpers/promis");
 const timelineChain = require("../../chains/video-editor-grouped-segment-based");
 
 module.exports.functions = [
+  // Define the function to generate the segments
+  // from the video media
   defineFunction({
     name: "generateTimeline",
     permissionTypes: ["user_access"],
@@ -67,6 +73,8 @@ module.exports.functions = [
     },
   }),
 
+  // Define the function to generate the segments
+  // from the video medias
   defineFunction({
     name: "generateVideoRevision",
     permissionTypes: ["user_access"],
@@ -172,6 +180,8 @@ module.exports.functions = [
     },
   }),
 
+  // Analyze the video media and generate the grouped segments
+  // based on the context
   defineFunction({
     name: "generateGroupedSegments",
     permissionTypes: ["user_access"],
@@ -206,6 +216,31 @@ module.exports.functions = [
       return {
         groupedSegments,
       };
+    },
+  }),
+
+  // Get ffmpeg props for a video
+  defineFunction({
+    name: "getFfmpegProps",
+    permissionTypes: ["user_access"],
+    callback: async ({ fileId }) => {
+      if (!fileId) {
+        throw new Error("fileId is required.");
+      }
+
+      const filePath = await getFilePath(fileId);
+
+      const ffmpeg = require("fluent-ffmpeg");
+
+      return new Promise((resolve, reject) => {
+        ffmpeg.ffprobe(filePath, (err, metadata) => {
+          if (err) {
+            reject(err);
+          }
+
+          resolve(metadata);
+        });
+      });
     },
   }),
 ];

@@ -7,7 +7,7 @@ const {
 
 const { VIDEO_PROJECT } = require("../../config");
 const { number } = require("zod");
-const { projectDocTriggers } = require("./triggers");
+const { projectDocTriggers, videoMediaTriggers } = require("./triggers");
 
 const groupedSegmentsSchema = new Schema({
   ids: [Number],
@@ -73,9 +73,10 @@ const videoMedia = new CollectionDefinition({
     new Permission({
       type: "user_access",
       read: true,
-      write: false,
+      write: true,
     }),
   ],
+  triggers: videoMediaTriggers,
 });
 
 const videoRevision = new CollectionDefinition({
