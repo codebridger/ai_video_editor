@@ -73,9 +73,9 @@ module.exports.functions = [
       //
       // Save the video revision
       //
-      const { videoRevision } = getVideoProjectModels();
+      const { videoMediaModel } = getVideoProjectModels();
 
-      const newRevision = await videoRevision.create({
+      const newRevision = await videoMediaModel.create({
         userId,
         projectId,
         prompt,

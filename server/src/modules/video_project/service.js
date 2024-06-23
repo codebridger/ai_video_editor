@@ -36,15 +36,15 @@ async function getVideoMediaDocsByFileIds(fileIds) {
 
 function getVideoProjectModels() {
   return {
-    project: getCollection(
+    projectModel: getCollection(
       VIDEO_PROJECT.DATABASE,
       VIDEO_PROJECT.PROJECT_COLLECTION
     ),
-    videoMedia: getCollection(
+    videoMediaModel: getCollection(
       VIDEO_PROJECT.DATABASE,
       VIDEO_PROJECT.VIDEO_MEDIA
     ),
-    videoRevision: getCollection(
+    videoRevisionModel: getCollection(
       VIDEO_PROJECT.DATABASE,
       VIDEO_PROJECT.VIDEO_REVISION
     ),

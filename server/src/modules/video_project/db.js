@@ -6,6 +6,8 @@ const {
 } = require("@modular-rest/server");
 
 const { VIDEO_PROJECT } = require("../../config");
+const { number } = require("zod");
+const { projectDocTriggers } = require("./triggers");
 
 const projectCollection = new CollectionDefinition({
   db: VIDEO_PROJECT.DATABASE,
@@ -26,6 +28,7 @@ const projectCollection = new CollectionDefinition({
       ownerIdField: "userId",
     }),
   ],
+  triggers: projectDocTriggers,
 });
 
 const videoMedia = new CollectionDefinition({
@@ -46,9 +49,17 @@ const videoMedia = new CollectionDefinition({
       // https://platform.openai.com/docs/api-reference/audio/createTranscription
       segments: [
         {
+          id: Number,
           start: Number,
           end: Number,
           text: String,
+        },
+      ],
+      // grouped segments based on their context.
+      groupedSegments: [
+        {
+          ids: [Number],
+          description: String,
         },
       ],
     },

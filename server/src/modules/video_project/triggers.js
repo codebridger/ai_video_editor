@@ -1,9 +1,70 @@
-const { CmsTrigger, getCollection } = require("@modular-rest/server/src");
+const {
+  CmsTrigger,
+  getCollection,
+  DatabaseTrigger,
+  removeFile,
+} = require("@modular-rest/server/src");
 const projectService = require("./service");
 const mediaProcessor = require("./mediaProcessor");
 const { VIDEO_PROJECT } = require("../../config");
 
+module.exports.projectDocTriggers = [
+  new DatabaseTrigger("remove-one", async ({ query, queryResult }) => {
+    const id = query._id;
+
+    const { videoMediaModel, videoRevisionModel } =
+      projectService.getVideoProjectModels();
+
+    // Remove all files
+    await videoMediaModel
+      .find({ projectId: id })
+      .exec()
+      .then((mediaFile) => {
+        mediaFile.forEach((file) => {
+          removeFile(file.fileId).catch((err) => {});
+        });
+      });
+
+    // Remove all media files
+    await videoMediaModel.deleteMany({ projectId: id }).exec();
+
+    // Remove all revisions files
+    await videoRevisionModel
+      .find({ projectId: id })
+      .exec()
+      .then((revisions) => {
+        revisions.forEach((revision) => {
+          removeFile(revision.exportedFileId).catch((err) => {});
+        });
+      });
+
+    // Remove all revisions
+    await videoRevisionModel.deleteMany({ projectId: id }).exec();
+  }),
+];
+
+module.exports.videoMediaTriggers = [
+  new DatabaseTrigger("remove-one", async ({ query, queryResult }) => {
+    // const id = query._id;
+    // const { videoMediaModel, videoRevisionModel } =
+    //   projectService.getVideoProjectModels();
+    // // Remove all files
+    // await videoMediaModel
+    //   .findById(id)
+    //   .exec()
+    //   .then((mediaFile) => {
+    //     removeFile(mediaFile.fileId).catch((err) => {});
+    //   });
+    // // Remove all media files
+    // await videoMediaModel.deleteOne({ projectId: id }).exec();
+  }),
+];
+
 module.exports.projectFileTriggers = [
+  /*
+  When a video file is uploaded, 
+  we need to process it to extract the audio and transcript.
+ */
   new CmsTrigger("insert-one", async ({ query, queryResult }) => {
     const { tag } = queryResult;
     const projectDoc = await projectService.findProjectById(tag);

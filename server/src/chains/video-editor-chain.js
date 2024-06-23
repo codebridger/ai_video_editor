@@ -1,22 +1,19 @@
 const { ChatPromptTemplate } = require("@langchain/core/prompts");
-const { ChatOpenAI } = require("@langchain/openai");
+
 const { z } = require("zod");
+const { model } = require("./model");
 
 function getBaseChain() {
-  const model = new ChatOpenAI({
-    temperature: 0.5,
-    model: "gpt-4o",
-    apiKey: process.env.OPENAI_API_KEY,
-  });
-
   const segmentIdsSchema = z.object({
     segment_ids: z
       .array(z.number().describe("id of the segment"))
       .describe("List of segment ids."),
   });
 
-  const modelWithStructuredOutput =
-    model.withStructuredOutput(segmentIdsSchema);
+  const modelWithStructuredOutput = model.withStructuredOutput(
+    segmentIdsSchema,
+    { includeRaw: true }
+  );
 
   const prompt = ChatPromptTemplate.fromMessages([
     [
@@ -57,7 +54,11 @@ function getBaseChain() {
 
 function invoke({ editing_request, caption_segments }) {
   const chain = getBaseChain();
-  return chain.invoke({ editing_request, caption_segments });
+  return chain
+    .invoke({ editing_request, caption_segments })
+    .then(({ raw, parsed }) => {
+      return parsed;
+    });
 }
 
 module.exports = { invoke };

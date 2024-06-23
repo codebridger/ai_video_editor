@@ -4,26 +4,18 @@ const path = require("path");
 const OpenAI = require("openai");
 const fs = require("fs");
 const { VIDEO_PROJECT } = require("../../config");
+const contextChain = require("../../chains/segment-grouper-chain");
+const { getVideoProjectModels } = require("./service");
+const { createFolder } = require("../../helpers/file");
 
 const temptDir = path.join(require.main?.path || process.cwd(), "..", "temp");
-
-function createFolder(folderPath) {
-  return new Promise((resolve, reject) => {
-    require("fs").mkdir(folderPath, { recursive: true }, (err) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve("");
-      }
-    });
-  });
-}
 
 async function processVideo(fileDoc) {
   const { _id, originalName, fileName, owner, format, tag, size } = fileDoc;
 
   const id = _id.toString();
   let segments = [];
+  let groupedSegments = [];
   let formatProp = {};
   let isProcessed = false;
 
@@ -34,8 +26,27 @@ async function processVideo(fileDoc) {
     const outputFile = await generateAudio(filePath);
 
     // Get the transcript segments
-    segments = await getTranscriptSegments(outputFile);
-    fs.unlinkSync(outputFile);
+    segments = await getTranscriptSegments(outputFile)
+      .then((segments) =>
+        segments.map((segment, index) => ({ ...segment, id: index }))
+      )
+      .finally(() => {
+        fs.unlinkSync(outputFile);
+      });
+
+    // get grouped segments
+    groupedSegments = await contextChain
+      .extractGroupsBySegments({
+        caption_segments: segments.map(({ text, id }) => ({ text, id })),
+      })
+      .then(({ groups }) => groups);
+
+    // generate group description
+    for (const group of groupedSegments) {
+      const lines = group.ids.map((id) => segments[id].text);
+      const description = await contextChain.extractGroupDescription(lines);
+      group["description"] = description;
+    }
 
     // Get format properties
     formatProp = await getFormatProperties(filePath);
@@ -45,22 +56,18 @@ async function processVideo(fileDoc) {
     isProcessed = false;
   }
 
-  const model = getCollection(
-    VIDEO_PROJECT.DATABASE,
-    VIDEO_PROJECT.VIDEO_MEDIA
-  );
+  const { videoMediaModel } = getVideoProjectModels();
 
   // Save the processed video
-  await model
-    .insertMany([
-      {
-        fileId: id,
-        projectId: tag,
-        format: formatProp,
-        isProcessed,
-        segments,
-      },
-    ])
+  await videoMediaModel
+    .create({
+      fileId: id,
+      projectId: tag,
+      format: formatProp,
+      isProcessed,
+      segments,
+      groupedSegments,
+    })
     .finally(() => {
       console.log("Video processed successfully" + id);
     });
