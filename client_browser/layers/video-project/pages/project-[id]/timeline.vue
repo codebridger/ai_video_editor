@@ -34,7 +34,10 @@
             'h-[550px] w-[400px]',
           ]"
         >
-          <template v-for="revision in mediaManager.videoRevisions">
+          <template
+            v-for="revision in mediaManager.videoRevisions"
+            :key="revision._id"
+          >
             <BaseCard
               :class="[
                 'p-2 w-96',
@@ -59,7 +62,7 @@
         </BaseCard>
       </template>
 
-      <WidgetsVideoPlayer class="flex-1" :revision="activeRevision" />
+      <WidgetsVideoPlayer class="flex-1" />
     </section>
   </div>
 </template>
@@ -102,7 +105,8 @@ async function renderTimeLine() {
     return new Promise((resolve) => setTimeout(resolve, time));
   }
 
-  while (revision.isPending) {
+  let isPending = true;
+  while (isPending) {
     await sleep(5000);
 
     await mediaManager.fetchVideoRevisions(mediaManager.projectId);
@@ -112,7 +116,7 @@ async function renderTimeLine() {
     );
 
     if (fetched) {
-      revision.isPending = fetched.isPending;
+      isPending = fetched.isPending;
     }
   }
 

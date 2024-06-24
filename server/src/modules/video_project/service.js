@@ -65,19 +65,22 @@ async function extractSegmentsWithFilePathFromProjectTimeline(projectId) {
       .findOne({ _id: groupedSegment.parentRef })
       .then((doc) => doc.toObject());
 
-    groupedSegment.ids.forEach(async (id) => {
-      const segmentIndex = videoDoc.segments.findIndex((seg) => seg.id === id);
+    for (const segmentId of groupedSegment.ids) {
+      const segmentIndex = videoDoc.segments.findIndex(
+        (seg) => seg.id === segmentId
+      );
 
       const segmentData = videoDoc.segments[segmentIndex];
 
       streamSegments.push({
+        order: streamSegments.length - 1,
         videoFilePath: await getFilePath(videoDoc.fileId),
         fileId: videoDoc.fileId,
         start: segmentData.start,
         end: segmentData.end,
         text: segmentData.text,
       });
-    });
+    }
   }
 
   return streamSegments;

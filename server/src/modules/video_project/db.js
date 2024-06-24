@@ -93,6 +93,7 @@ const videoRevision = new CollectionDefinition({
       segments: [
         {
           videoFilePath: { type: String, required: true },
+          order: { type: Number, required: true },
           fileId: { type: String, required: true },
           start: { type: Number, required: true },
           end: { type: Number, required: true },

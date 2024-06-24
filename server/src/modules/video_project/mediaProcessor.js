@@ -242,7 +242,7 @@ async function mergeVideos(inputFiles, outputFile, onProgress = (p) => {}) {
 /**
  * Exports video segments based on the provided video file paths and segment details.
  *
- * @param {Array<{videoFilePath: string, start: number, end: number}>} segments - An array of segment objects.
+ * @param {Array<{videoFilePath: string, start: number, end: number, order:number}>} segments - An array of segment objects.
  * @param {(p:any)=>void} onProgress - A callback function to report progress.
  * @returns {Promise<any>}
  */
@@ -273,7 +273,7 @@ async function exportVideoBySegments(
     const duration = end - start;
     const outputFile = path.join(
       exportDir,
-      `segment-${timestamp}-${start}-${end}.mp4`
+      `segment-${timestamp}-${intermediateFiles.length}.mp4`
     );
     await extractSegment(videoFilePath, start, duration, outputFile);
     intermediateFiles.push(outputFile);

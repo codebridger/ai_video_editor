@@ -10,7 +10,18 @@
         }}</span>
       </div>
 
-      <div class="flex space-x-1">
+      <div class="flex">
+        <BaseButtonIcon
+          rounded="none"
+          size="sm"
+          data-nui-tooltip="Remove File"
+          data-nui-tooltip-position="left"
+          @click="removeFile"
+        >
+          <!-- Refresh -->
+          <Icon name="i-ph-trash-fill" class="size-5" />
+        </BaseButtonIcon>
+
         <BaseButtonIcon
           :loading="isPending"
           :disabled="isPending"
@@ -27,7 +38,7 @@
         <BaseButtonIcon
           rounded="none"
           size="sm"
-          data-nui-tooltip="Regenerate Segments"
+          data-nui-tooltip="Play Video"
           data-nui-tooltip-position="left"
           @click="mediaManagerStore.fetchVideoLink(media.fileId)"
         >
@@ -36,6 +47,10 @@
         </BaseButtonIcon>
       </div>
     </div>
+
+    <span class="px-2 text-sm text-gray-600">{{
+      ffmpegProps.creation_time
+    }}</span>
 
     <div class="p-4 max-w-sm space-y-2" v-if="isPending || !media.isProcessed">
       <BasePlaceload class="h-4 w-full rounded" />
@@ -139,9 +154,11 @@ const tabs = [
 const ffmpegProps = ref<{
   width: number;
   height: number;
+  creation_time: string;
 }>({
   width: 0,
   height: 0,
+  creation_time: "",
 });
 
 onMounted(() => {
@@ -153,12 +170,26 @@ onMounted(() => {
 });
 
 function generateGroupedSegments() {
+  if (
+    !window.confirm("Do you really want to re generate context of this video?")
+  ) {
+    return;
+  }
+
   isPending.value = true;
 
   mediaManagerStore.generateGroupedSegments(props.media._id).finally(() => {
     isPending.value = false;
     key.value = Date.now();
   });
+}
+
+function removeFile() {
+  if (!window.confirm("Do you really want to delete this video?")) {
+    return;
+  }
+
+  mediaManagerStore.removeProjectFile(props.media.fileId);
 }
 
 async function checkIfProcessed() {
@@ -186,6 +217,10 @@ function fetchFfmpegProps() {
       ffmpegProps.value = {
         width: videoSteam.width,
         height: videoSteam.height,
+        creation_time: (res.format.tags.creation_time || "")
+          .split("T")
+          .join(" ")
+          .split(".")[0],
       };
     });
 }

@@ -18,6 +18,4 @@ import { fileProvider } from "@modular-rest/client";
 
 import { useMediaManagerStore } from "../../store/mediaManager";
 const mediaManager = useMediaManagerStore();
-
-const props = defineProps({});
 </script>
