@@ -47,10 +47,3 @@ const tabs = [
   },
 ];
 </script>
-
-<style scoped>
-/* How target down level styles */
-::v-deep .tabs-m-0 {
-  margin: 0 !important;
-}
-</style>

@@ -15,3 +15,10 @@ onMounted(() => {
     <slot />
   </TairoSidebarLayout>
 </template>
+
+<style>
+/* How target down level styles */
+.tabs-m-0 {
+  margin: 0 !important;
+}
+</style>

@@ -49,15 +49,17 @@
 
               <BaseButton
                 :loading="revision.isPending"
-                @click="activeRevision = revision"
-                >Play</BaseButton
+                :disabled="revision.isPending"
+                @click="mediaManager.fetchVideoLink(revision.fileId)"
               >
+                Play
+              </BaseButton>
             </BaseCard>
           </template>
         </BaseCard>
       </template>
 
-      <WidgetsProjectRevisionPlayer class="flex-1" :revision="activeRevision" />
+      <WidgetsVideoPlayer class="flex-1" :revision="activeRevision" />
     </section>
   </div>
 </template>
@@ -101,7 +103,7 @@ async function renderTimeLine() {
   }
 
   while (revision.isPending) {
-    await sleep(1000);
+    await sleep(5000);
 
     await mediaManager.fetchVideoRevisions(mediaManager.projectId);
 
@@ -116,6 +118,4 @@ async function renderTimeLine() {
 
   isRenderingTimeline.value = false;
 }
-
-function playRevision() {}
 </script>

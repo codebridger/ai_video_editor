@@ -10,9 +10,10 @@
         }}</span>
       </div>
 
-      <div>
+      <div class="flex space-x-1">
         <BaseButtonIcon
           :loading="isPending"
+          :disabled="isPending"
           rounded="none"
           size="sm"
           data-nui-tooltip="Regenerate Segments"
@@ -22,6 +23,17 @@
           <!-- Refresh -->
           <Icon name="i-ph-repeat-fill" class="size-5" />
         </BaseButtonIcon>
+
+        <BaseButtonIcon
+          rounded="none"
+          size="sm"
+          data-nui-tooltip="Regenerate Segments"
+          data-nui-tooltip-position="left"
+          @click="mediaManagerStore.fetchVideoLink(media.fileId)"
+        >
+          <!-- Refresh -->
+          <Icon name="i-ph-play-fill" class="size-5" />
+        </BaseButtonIcon>
       </div>
     </div>
 
@@ -30,27 +42,76 @@
       <BasePlaceload class="h-4 w-[85%] rounded" />
     </div>
 
-    <draggable
-      v-else
-      class="p-4 flex flex-col space-y-1"
-      :key="key"
-      :list="media.groupedSegments"
-      :group="'grouped-segments'"
-      item-key="_id"
-    >
-      <template
-        #item="{ element, index }: { element: GroupedSegment, index: number }"
-      >
-        <BaseCard class="p-2 flex items-end justify-between">
-          <p class="text-sm select-none">
-            {{ element.description }}
-          </p>
-          <spam class="ml-1 text-muted-400 text-xs"
-            >{{ Math.floor(element.duration) }}s</spam
+    <section v-else>
+      <BaseTabs
+        v-model="activeTab"
+        :tabs="tabs"
+        class="mx-4 border-b-[1px] border-gray-200 dark:border-gray-700"
+        :classes="{ inner: 'tabs-m-0' }"
+      />
+
+      <!-- Grouped Segments -->
+      <template v-if="activeTab == 'groupedSegments'">
+        <draggable
+          class="p-4 flex flex-col space-y-1"
+          :key="key"
+          :list="media.groupedSegments"
+          :group="'grouped-segments'"
+          item-key="_id"
+        >
+          <template
+            #item="{
+              element,
+              index,
+            }: {
+              element: GroupedSegment,
+              index: number,
+            }"
           >
-        </BaseCard>
+            <BaseCard
+              class="p-2 flex items-end justify-between cursor-pointer select-none"
+            >
+              <p class="text-sm">
+                {{ element.description }}
+              </p>
+              <span class="ml-1 text-muted-400 text-xs"
+                >{{ Math.floor(element.duration) }}s</span
+              >
+            </BaseCard>
+          </template>
+        </draggable>
       </template>
-    </draggable>
+
+      <!-- Captions -->
+      <template v-if="activeTab == 'segments'">
+        <draggable
+          class="p-4 flex flex-col space-y-1"
+          :key="key"
+          :list="media.segments"
+          :group="'grouped-segment'"
+          item-key="_id"
+        >
+          <template
+            #item="{
+              element,
+              index,
+            }: {
+              element: GroupedSegment,
+              index: number,
+            }"
+          >
+            <BaseCard class="p-2 flex items-end justify-between">
+              <p class="text-sm select-none">
+                {{ element.text }}
+              </p>
+              <span class="ml-1 text-muted-400 text-xs"
+                >{{ Math.floor(element.end - element.start) }}s</span
+              >
+            </BaseCard>
+          </template>
+        </draggable>
+      </template>
+    </section>
   </BaseCard>
 </template>
 
@@ -68,6 +129,12 @@ const props = defineProps<{
 
 const isPending = ref(false);
 const key = ref(Date.now());
+
+const activeTab = ref("groupedSegments");
+const tabs = [
+  { label: "Topics", value: "groupedSegments" },
+  { label: "Captions", value: "segments" },
+];
 
 const ffmpegProps = ref<{
   width: number;
@@ -112,9 +179,13 @@ function fetchFfmpegProps() {
       args: { fileId: props.media.fileId },
     })
     .then((res: any) => {
+      const videoSteam = res.streams.find(
+        (stream: any) => stream.codec_type === "video"
+      );
+
       ffmpegProps.value = {
-        width: res.streams[0].width,
-        height: res.streams[0].height,
+        width: videoSteam.width,
+        height: videoSteam.height,
       };
     });
 }

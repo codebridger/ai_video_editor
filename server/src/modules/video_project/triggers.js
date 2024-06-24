@@ -34,7 +34,7 @@ module.exports.projectDocTriggers = [
       .exec()
       .then((revisions) => {
         revisions.forEach((revision) => {
-          removeFile(revision.exportedFileId).catch((err) => {});
+          removeFile(revision.fileId).catch((err) => {});
         });
       });
 

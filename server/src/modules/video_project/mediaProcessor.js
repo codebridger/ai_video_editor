@@ -294,7 +294,7 @@ async function exportVideoBySegments(
     })
     .finally(() => {
       // Optionally, clean up intermediate files
-      intermediateFiles.forEach((file) => fs.unlinkSync(file));
+      intermediateFiles.forEach((file) => safeUnlink(file));
     });
 }
 

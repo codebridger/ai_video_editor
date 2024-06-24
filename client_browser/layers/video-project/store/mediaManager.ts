@@ -31,6 +31,8 @@ export const useMediaManagerStore = defineStore("mediaManagerStore", () => {
 
   const timeline = ref<GroupedSegment[]>([]);
 
+  const activeVideoForPlayer = ref<string | null>(null);
+
   const videoRevisions = ref<VideoRevisionType[]>([]);
 
   function initialize(id: string) {
@@ -251,6 +253,23 @@ export const useMediaManagerStore = defineStore("mediaManagerStore", () => {
     });
   }
 
+  async function fetchVideoLink(fileId: string) {
+    const fileDoc = await fileProvider.getFileDoc(
+      fileId,
+      // @ts-ignore
+      authUser.value?.id
+    );
+
+    if (!fileDoc) {
+      activeVideoForPlayer.value = null;
+      return;
+    }
+
+    activeVideoForPlayer.value = fileProvider
+      // @ts-ignore
+      .getFileLink(fileDoc);
+  }
+
   return {
     projectId,
     projectFiles,
@@ -258,6 +277,7 @@ export const useMediaManagerStore = defineStore("mediaManagerStore", () => {
     processedVideoMediaList,
     timeline,
     videoRevisions,
+    activeVideoForPlayer,
     initialize,
     startUploadSession,
     checkUploadProgress,
@@ -270,5 +290,6 @@ export const useMediaManagerStore = defineStore("mediaManagerStore", () => {
     generateGroupedSegments,
     updateProjectTimeLine,
     generateTimeline,
+    fetchVideoLink,
   };
 });
