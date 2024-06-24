@@ -29,7 +29,7 @@
         :class="[
           'p-1 border-solid rounded border-[1px] border-gray-200 dark:border-muted-700',
           'overflow-y-auto',
-          'h-[650px] w-[400px]',
+          'h-[550px] w-[400px]',
         ]"
         v-model="tempFiles"
         :group="'grouped-segments'"
