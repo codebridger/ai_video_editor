@@ -52,7 +52,7 @@ function getBaseChain() {
 }
 
 async function invoke({ editing_request, grouped_segments = [] }) {
-  grouped_segments = grouped_segments.map((segment, i) => ({
+  const tempSegments = grouped_segments.map((segment, i) => ({
     id: i,
     duration: Math.floor(segment.duration) + " seconds",
     description: segment.description,
@@ -63,13 +63,13 @@ async function invoke({ editing_request, grouped_segments = [] }) {
   const partIds = await chain
     .invoke({
       editing_request,
-      grouped_segments: grouped_segments
+      grouped_segments: tempSegments
         .map(
           (segment) =>
             `${segment.id}, ${segment.duration} seconds, ${segment.description}`
         )
         .join("\n"),
-      total_segments: grouped_segments.length - 1,
+      total_segments: tempSegments.length - 1,
     })
     .then(({ raw, parsed }) => {
       return parsed.partIds;
@@ -86,8 +86,10 @@ async function invoke({ editing_request, grouped_segments = [] }) {
 
     timeline.push({
       id: partId,
-      duration: parseInt(grouped_segments[partId].duration.split(" ")[0]),
+      duration: parseInt(tempSegments[partId].duration.split(" ")[0]),
       description: grouped_segments[partId].description,
+      ids: grouped_segments[partId].ids,
+      parentRef: grouped_segments[partId].parentRef,
     });
   }
 

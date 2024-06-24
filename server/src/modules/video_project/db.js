@@ -13,6 +13,7 @@ const groupedSegmentsSchema = new Schema({
   ids: [Number],
   description: String,
   duration: Number,
+  parentRef: String,
 });
 
 const projectCollection = new CollectionDefinition({
@@ -87,16 +88,14 @@ const videoRevision = new CollectionDefinition({
       userId: String,
       projectId: String,
       prompt: String,
-      exportedFileId: String,
+      fileId: String,
       isPending: Boolean,
-      originalFileIds: [{ type: String, required: true }],
       segments: [
         {
+          videoFilePath: { type: String, required: true },
           fileId: { type: String, required: true },
-          id: { type: String, required: true },
           start: { type: Number, required: true },
           end: { type: Number, required: true },
-          duration: { type: Number, required: true },
           text: { type: String, required: true },
         },
       ],

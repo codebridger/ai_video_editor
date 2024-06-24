@@ -4,12 +4,15 @@ import {
   functionProvider,
   dataProvider,
 } from "@modular-rest/client";
+
 import { defineStore } from "pinia";
+
 import {
   VIDEO_PROJECT_DATABASE,
   type GroupedSegment,
   type ProjectType,
   type VideoMediaType,
+  type VideoRevisionType,
 } from "../types/project.type";
 
 export const useMediaManagerStore = defineStore("mediaManagerStore", () => {
@@ -28,12 +31,15 @@ export const useMediaManagerStore = defineStore("mediaManagerStore", () => {
 
   const timeline = ref<GroupedSegment[]>([]);
 
+  const videoRevisions = ref<VideoRevisionType[]>([]);
+
   function initialize(id: string) {
     projectId.value = id;
 
     fetchProjectTimeLine(id);
     fetchProjectFiles(id);
     fetchVideoMedias(id);
+    fetchVideoRevisions(id);
   }
 
   function fetchProjectTimeLine(id: string) {
@@ -77,6 +83,18 @@ export const useMediaManagerStore = defineStore("mediaManagerStore", () => {
       })
       .then((medias) => {
         processedVideoMediaList.value = medias;
+      });
+  }
+
+  function fetchVideoRevisions(projectId: string) {
+    return dataProvider
+      .find<VideoRevisionType>({
+        database: VIDEO_PROJECT_DATABASE.DATABASE,
+        collection: VIDEO_PROJECT_DATABASE.VIDEO_REVISION,
+        query: { projectId, userId: authUser.value?.id },
+      })
+      .then((revisions) => {
+        videoRevisions.value = revisions;
       });
   }
 
@@ -170,17 +188,6 @@ export const useMediaManagerStore = defineStore("mediaManagerStore", () => {
       });
   }
 
-  function generateVideoRevision(context: { prompt: string; ids: string[] }) {
-    return functionProvider.run({
-      name: "generateVideoRevision",
-      args: {
-        prompt: context.prompt,
-        mediaVideoIds: context.ids,
-        userId: authUser.value?.id,
-      },
-    });
-  }
-
   function generateGroupedSegments(videoMediaId: string) {
     return functionProvider
       .run({
@@ -233,17 +240,31 @@ export const useMediaManagerStore = defineStore("mediaManagerStore", () => {
       });
   }
 
+  function renderTimeline(context: { prompt: string }) {
+    return functionProvider.run<VideoRevisionType>({
+      name: "generateVideoRevision",
+      args: {
+        prompt: context.prompt,
+        projectId: projectId.value,
+        userId: authUser.value?.id,
+      },
+    });
+  }
+
   return {
+    projectId,
     projectFiles,
     uploadList,
     processedVideoMediaList,
     timeline,
+    videoRevisions,
     initialize,
     startUploadSession,
     checkUploadProgress,
     fetchProjectFiles,
     removeProjectFile,
-    generateVideoRevision,
+    fetchVideoRevisions,
+    renderTimeline,
     fetchVideoMedias,
     fetchVideoMediaByFileId,
     generateGroupedSegments,

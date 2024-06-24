@@ -111,7 +111,7 @@ function fetchFfmpegProps() {
       name: "getFfmpegProps",
       args: { fileId: props.media.fileId },
     })
-    .then((res) => {
+    .then((res: any) => {
       ffmpegProps.value = {
         width: res.streams[0].width,
         height: res.streams[0].height,

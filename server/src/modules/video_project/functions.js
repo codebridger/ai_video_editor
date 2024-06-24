@@ -12,6 +12,8 @@ const {
 const {
   getVideoMediaDocsByFileIds,
   getVideoProjectModels,
+  findProjectById,
+  extractSegmentsWithFilePathFromProjectTimeline,
 } = require("./service");
 
 const contextChain = require("../../chains/segment-grouper-chain");
@@ -19,8 +21,8 @@ const { sleep } = require("../../helpers/promis");
 const timelineChain = require("../../chains/video-editor-grouped-segment-based");
 
 module.exports.functions = [
-  // Define the function to generate the segments
-  // from the video media
+  // Generate the timeline based given prompt
+  // timeline is a sort of grouped segments
   defineFunction({
     name: "generateTimeline",
     permissionTypes: ["user_access"],
@@ -56,7 +58,12 @@ module.exports.functions = [
         const videoMediaJson = videoMedia.toObject();
 
         groupedSegments = groupedSegments.concat(
-          videoMediaJson.groupedSegments
+          videoMediaJson.groupedSegments.map((segment) => {
+            return {
+              ...segment,
+              parentRef: videoMediaJson._id.toString(),
+            };
+          })
         );
       }
 
@@ -73,110 +80,85 @@ module.exports.functions = [
     },
   }),
 
-  // Define the function to generate the segments
-  // from the video medias
+  // Render the video based on the timeline
+  // and return the revision document
   defineFunction({
     name: "generateVideoRevision",
     permissionTypes: ["user_access"],
-    callback: async ({ prompt, mediaVideoIds, userId }) => {
-      if (!prompt || !mediaVideoIds || !userId) {
+    callback: async ({ prompt, projectId, userId }) => {
+      if (!prompt || !projectId || !userId) {
         throw new Error("prompt and ids is required. userId is required.");
-      } else if (mediaVideoIds.length === 0 || prompt.length < 30) {
-        throw new Error(
-          "prompt has to be at least 30 characters, and ids must be at least 1"
-        );
       }
 
-      //
-      // Get the videos from the ids
-      //
+      const projectDoc = await findProjectById(projectId);
 
-      const videos = await getVideoMediaDocsByFileIds(mediaVideoIds);
-      const projectId = videos[0].projectId;
-
-      const segments = [];
-
-      if (!videos) {
-        throw new Error("No videos found with the given ids");
+      if (!projectDoc) {
+        throw new Error("No project found with the given id");
+      } else if (projectDoc.userId !== userId) {
+        throw new Error("User does not have access to the project");
       }
 
-      //
-      // concatenate all the segments from all the videos into a single list
-      //
-
-      let segmentId = 0;
-      for (const video of videos) {
-        video.segments.forEach((segment) => {
-          segments.push({
-            fileId: video.fileId,
-            id: segmentId,
-            start: segment.start,
-            end: segment.end,
-            duration: segment.end - segment.start,
-            text: segment.text,
-          });
-
-          segmentId++;
-        });
-      }
-
-      //
-      // Generate the video revision
-      //
-
-      const revisionContainsSegmentIds =
-        await videoEditorCaptionBasedChain.invoke({
-          editing_request: prompt,
-          caption_segments: segments.map((segment) => ({
-            id: segment.id,
-            duration: segment.duration,
-            text: segment.text,
-          })),
-        });
-
-      const newSegmentList = segments.filter((segment) =>
-        revisionContainsSegmentIds.segment_ids.includes(segment.id)
-      );
+      // extract segments
+      const extractedSegments =
+        await extractSegmentsWithFilePathFromProjectTimeline(projectId);
 
       //
       // Save the video revision
       //
-      const { videoMediaModel, videoRevisionModel } = getVideoProjectModels();
+      const { videoRevisionModel } = getVideoProjectModels();
 
-      const newRevision = await videoMediaModel.create({
+      const newRevision = await videoRevisionModel.create({
         userId,
         projectId,
         prompt,
         isPending: true,
-        originalFileIds: mediaVideoIds,
-        segments: newSegmentList,
+        segments: extractedSegments,
       });
 
       //
       // Export the video from the revision
       //
 
-      exportVideoBySegments(mediaVideoIds, newSegmentList).then(
-        async (fileForSaving) => {
+      exportVideoBySegments(extractedSegments)
+        .then(async (fileForSaving) => {
           const exportedFileId = await storeFile({
             file: fileForSaving,
             ownerId: userId,
-            tag: "video_revision",
+            tag: newRevision._id.toString(),
             removeFileAfterStore: true,
           })
             .then((savedFile) => savedFile._id.toString())
             .catch((error) => "");
 
-          videoRevisionModel.findByIdAndUpdate(newRevision._id, {
-            isPending: false,
-            exportedFileId: exportedFileId,
-          });
-        }
-      );
+          await videoRevisionModel
+            .updateOne(
+              {
+                _id: newRevision._id,
+              },
+              {
+                $set: { isPending: false, fileId: exportedFileId },
+              }
+            )
+            .exec()
+            .then((res) => {
+              console.log("Video revision exported successfully", res);
+            });
+        })
+        .catch(async (error) => {
+          console.error("Error exporting video revision", error);
+          await videoRevisionModel
+            .updateOne(
+              {
+                _id: newRevision._id,
+              },
+              {
+                $set: { isPending: false },
+              }
+            )
+            .exec();
+        });
 
-      return {
-        revisionId: newRevision._id.toString(),
-      };
+      return newRevision.toObject();
     },
   }),
 

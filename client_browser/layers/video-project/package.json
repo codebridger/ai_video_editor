@@ -8,9 +8,11 @@
   "dependencies": {
     "@pinia/nuxt": "^0.5.1",
     "@shuriken-ui/nuxt": "^3.2.1",
+    "@videojs-player/vue": "^1.0.0",
     "nuxt": "3.11.2",
     "pinia": "^2.1.7",
     "vee-validate": "^4.13.1",
+    "video.js": "^8.12.0",
     "vuedraggable": "^4.1.0",
     "yup": "^1.4.0"
   },

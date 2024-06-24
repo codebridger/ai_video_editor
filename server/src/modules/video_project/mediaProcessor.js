@@ -240,60 +240,42 @@ async function mergeVideos(inputFiles, outputFile, onProgress = (p) => {}) {
 }
 
 /**
- * Defines the type for a segment object.
+ * Exports video segments based on the provided video file paths and segment details.
  *
- * @typedef {Object} Segment
- * @property {string} fileId - The ID of the video the segment belongs to.
- * @property {string} id - A unique identifier for the segment.
- * @property {number} start - The start time of the segment in the video.
- * @property {number} end - The end time of the segment in the video.
- * @property {number} duration - The duration of the segment, calculated as end - start.
- * @property {string} text - The text associated with the segment.
- */
-/**
- * Exports video segments based on the provided video IDs and segment details.
- *
- * @param {string[]} fileId - An array of file IDs to be processed.
- * @param {Segment[]} segments - An array of segment objects.
+ * @param {Array<{videoFilePath: string, start: number, end: number}>} segments - An array of segment objects.
+ * @param {(p:any)=>void} onProgress - A callback function to report progress.
  * @returns {Promise<any>}
  */
 async function exportVideoBySegments(
-  fileId = [],
   segments = [],
   onProgress = (progress) => {}
 ) {
-  console.log(
-    `Exporting video from ${segments.length} segments from ${fileId.length} files.`
-  );
+  console.log(`Exporting video from ${segments.length} segments.`);
 
-  const total_duration = segments.reduce(
-    (acc, segment) => acc + segment.duration,
+  const totalDuration = segments.reduce(
+    (acc, segment) => acc + (segment.end - segment.start),
     0
   );
 
-  console.log(`Total duration of segments: ${total_duration} seconds`);
+  console.log(`Total duration of segments: ${totalDuration} seconds`);
 
-  const filePaths = {};
   const intermediateFiles = [];
-  const export_dir = path.join(temptDir, "exported_videos");
-  await createFolder(export_dir);
-  const timestamp = Date.now();
-  const outputFilePath = path.join(export_dir, `${timestamp}.mp4`);
-
-  // Get file paths for each video ID
-  for (const id of fileId) {
-    filePaths[id] = await getFilePath(id);
+  const exportDir = path.join(temptDir, "exported_videos"); // Define your tempDir properly
+  if (!fs.existsSync(exportDir)) {
+    fs.mkdirSync(exportDir);
   }
+  const timestamp = Date.now();
+  const outputFilePath = path.join(exportDir, `${timestamp}.mp4`);
 
   // Extract segments
   for (const segment of segments) {
-    const { fileId, start, duration } = segment;
-    const filePath = filePaths[fileId];
+    const { videoFilePath, start, end } = segment;
+    const duration = end - start;
     const outputFile = path.join(
-      export_dir,
-      `segment-${timestamp}-${segment.id}.mp4`
+      exportDir,
+      `segment-${timestamp}-${start}-${end}.mp4`
     );
-    await extractSegment(filePath, start, duration, outputFile);
+    await extractSegment(videoFilePath, start, duration, outputFile);
     intermediateFiles.push(outputFile);
   }
 
@@ -306,17 +288,31 @@ async function exportVideoBySegments(
     .catch((err) => {
       console.error(`Error merging videos: ${err.message}`);
       try {
-        safeUnlink(outputFilePath);
+        fs.unlinkSync(outputFilePath);
       } catch (error) {}
       return "";
     })
     .finally(() => {
       // Optionally, clean up intermediate files
-      intermediateFiles.forEach((file) => safeUnlink(file));
+      intermediateFiles.forEach((file) => fs.unlinkSync(file));
     });
 }
 
 function getFileInformation(filePath) {
+  function getMimeType(codec_name) {
+    const codecToMimeMap = {
+      h264: "video/mp4",
+      vp8: "video/webm",
+      vp9: "video/webm",
+      aac: "audio/aac",
+      mp3: "audio/mpeg",
+      opus: "audio/opus",
+      vorbis: "audio/vorbis",
+    };
+
+    return codecToMimeMap[codec_name] || "application/octet-stream";
+  }
+
   return new Promise((resolve, reject) => {
     // Getting file size
     const fileSize = fs.statSync(filePath).size;
@@ -330,7 +326,7 @@ function getFileInformation(filePath) {
         reject(err);
       } else {
         // Assuming the first stream is representative for the file type
-        const fileType = metadata.streams[0].codec_type;
+        const fileType = getMimeType(metadata.streams[0].codec_name);
         // Constructing the file info object
         const fileInfo = {
           path: filePath,

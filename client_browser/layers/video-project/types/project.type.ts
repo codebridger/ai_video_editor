@@ -41,3 +41,18 @@ export type VideoMediaType = {
   segments: Segment[];
   groupedSegments: GroupedSegment[];
 };
+
+export type VideoRevisionType = {
+  _id: string;
+  userId: string;
+  projectId: string;
+  prompt: string;
+  fileId: string;
+  isPending: boolean;
+  segments: Array<{
+    fileId: string;
+    start: number;
+    end: number;
+    text: string;
+  }>;
+};
