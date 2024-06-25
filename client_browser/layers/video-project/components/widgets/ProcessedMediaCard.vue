@@ -71,8 +71,9 @@
           class="p-4 flex flex-col space-y-1"
           :key="key"
           :list="media.groupedSegments"
-          :group="'grouped-segments'"
+          :group="{ name: 'grouped-segments', pull: 'clone', put: false }"
           item-key="_id"
+          :clone="clone"
         >
           <template
             #item="{
@@ -103,7 +104,7 @@
           class="p-4 flex flex-col space-y-1"
           :key="key"
           :list="media.segments"
-          :group="'grouped-segment'"
+          :group="{ name: 'grouped-segment', pull: 'clone', put: false }"
           item-key="_id"
         >
           <template
@@ -134,7 +135,11 @@
 import draggable from "vuedraggable";
 import { functionProvider } from "@modular-rest/client";
 import { useMediaManagerStore } from "../../store/mediaManager";
-import type { GroupedSegment, VideoMediaType } from "../../types/project.type";
+import type {
+  GroupedSegment,
+  VideoMediaType,
+  TimelineGroupedSegmentType,
+} from "../../types/project.type";
 import { isRTL } from "../../helpers/languages";
 
 const mediaManagerStore = useMediaManagerStore();
@@ -223,5 +228,32 @@ function fetchFfmpegProps() {
           .split(".")[0],
       };
     });
+}
+
+function clone(element: GroupedSegment) {
+  const clone = JSON.parse(
+    JSON.stringify(element)
+  ) as TimelineGroupedSegmentType;
+
+  let processedVideoId = "";
+  let fileId = "";
+
+  for (let i = 0; i < mediaManagerStore.processedVideoMediaList.length; i++) {
+    const video = mediaManagerStore.processedVideoMediaList[i];
+
+    for (let j = 0; j < video.groupedSegments.length; j++) {
+      const groupedSegment = video.groupedSegments[j];
+
+      if (groupedSegment._id === element._id) {
+        clone["processedVideoId"] = video._id;
+        clone["fileId"] = video.fileId;
+        break;
+      }
+    }
+  }
+
+  console.log(clone);
+
+  return clone;
 }
 </script>

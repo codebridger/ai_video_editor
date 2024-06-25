@@ -11,6 +11,7 @@ import {
   VIDEO_PROJECT_DATABASE,
   type GroupedSegment,
   type ProjectType,
+  type TimelineGroupedSegmentType,
   type VideoMediaType,
   type VideoRevisionType,
 } from "../types/project.type";
@@ -29,7 +30,7 @@ export const useMediaManagerStore = defineStore("mediaManagerStore", () => {
   // These are process content of cms files
   const processedVideoMediaList = ref<VideoMediaType[]>([]);
 
-  const timeline = ref<GroupedSegment[]>([]);
+  const timeline = ref<TimelineGroupedSegmentType[]>([]);
 
   const activeVideoForPlayer = ref<string | null>(null);
 

@@ -6,14 +6,20 @@ const {
 } = require("@modular-rest/server");
 
 const { VIDEO_PROJECT } = require("../../config");
-const { number } = require("zod");
 const { projectDocTriggers, videoMediaTriggers } = require("./triggers");
 
 const groupedSegmentsSchema = new Schema({
   ids: [Number],
   description: String,
   duration: Number,
-  parentRef: String,
+});
+
+const TimelineGroupedSegmentTypesSchema = new Schema({
+  ids: [Number],
+  description: String,
+  duration: Number,
+  processedVideoId: String,
+  fileId: String,
 });
 
 const projectCollection = new CollectionDefinition({
@@ -23,7 +29,7 @@ const projectCollection = new CollectionDefinition({
     {
       title: String,
       userId: String,
-      timeline: [groupedSegmentsSchema],
+      timeline: [TimelineGroupedSegmentTypesSchema],
     },
     { timestamps: true }
   ),
@@ -93,7 +99,6 @@ const videoRevision = new CollectionDefinition({
       segments: [
         {
           videoFilePath: { type: String, required: true },
-          order: { type: Number, required: true },
           fileId: { type: String, required: true },
           start: { type: Number, required: true },
           end: { type: Number, required: true },

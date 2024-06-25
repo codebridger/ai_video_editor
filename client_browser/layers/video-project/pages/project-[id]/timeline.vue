@@ -99,7 +99,9 @@ function generateTimeline() {
 async function renderTimeLine() {
   isRenderingTimeline.value = true;
 
-  const revision = await mediaManager.renderTimeline({ prompt: prompt.value });
+  const newRevision = await mediaManager.renderTimeline({
+    prompt: prompt.value,
+  });
 
   function sleep(time: number) {
     return new Promise((resolve) => setTimeout(resolve, time));
@@ -112,7 +114,7 @@ async function renderTimeLine() {
     await mediaManager.fetchVideoRevisions(mediaManager.projectId);
 
     const fetched = mediaManager.videoRevisions.find(
-      (revision) => revision._id === revision._id
+      (revision) => revision._id === newRevision._id
     );
 
     if (fetched) {

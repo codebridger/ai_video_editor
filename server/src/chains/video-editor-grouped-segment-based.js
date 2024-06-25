@@ -89,7 +89,8 @@ async function invoke({ editing_request, grouped_segments = [] }) {
       duration: parseInt(tempSegments[partId].duration.split(" ")[0]),
       description: grouped_segments[partId].description,
       ids: grouped_segments[partId].ids,
-      parentRef: grouped_segments[partId].parentRef,
+      processedVideoId: grouped_segments[partId].processedVideoId,
+      fileId: grouped_segments[partId].fileId,
     });
   }
 

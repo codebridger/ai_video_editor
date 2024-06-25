@@ -61,7 +61,8 @@ module.exports.functions = [
           videoMediaJson.groupedSegments.map((segment) => {
             return {
               ...segment,
-              parentRef: videoMediaJson._id.toString(),
+              processedVideoId: videoMediaJson._id.toString(),
+              fileId: videoMediaJson.fileId,
             };
           })
         );

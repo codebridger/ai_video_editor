@@ -5,11 +5,20 @@ export const VIDEO_PROJECT_DATABASE = {
   VIDEO_REVISION: "video_revision",
 };
 
+export type TimelineGroupedSegmentType = {
+  _id: string;
+  ids: number[];
+  duration: number;
+  description: string;
+  processedVideoId: String;
+  fileId: string;
+};
+
 export type ProjectType = {
   _id: string;
   title: string;
   userId: string;
-  timeline: [GroupedSegment];
+  timeline: [TimelineGroupedSegmentType];
 };
 
 export type Segment = {

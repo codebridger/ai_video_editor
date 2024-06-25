@@ -28,7 +28,7 @@
         'h-[550px] w-[400px]',
       ]"
       v-model="tempFiles"
-      :group="'grouped-segments'"
+      :group="{ name: 'grouped-segments', pull: true, put: true }"
       item-key="_id"
       @change="onDrop"
     >
@@ -50,7 +50,7 @@
 
 <script setup lang="ts">
 import draggable from "vuedraggable";
-import type { GroupedSegment } from "../../types/project.type";
+import type { TimelineGroupedSegmentType } from "../../types/project.type";
 import { isRTL } from "../../helpers/languages";
 import { VideoPlayer } from "@videojs-player/vue";
 import "video.js/dist/video-js.css";
@@ -60,13 +60,15 @@ const mediaManager = useMediaManagerStore();
 
 const props = defineProps({
   title: String,
-  modelValue: Array as PropType<GroupedSegment[]>,
+  modelValue: Array as PropType<TimelineGroupedSegmentType[]>,
 });
 
-const emit = defineEmits<{ "update:modelValue": [GroupedSegment[]] }>();
+const emit = defineEmits<{
+  "update:modelValue": [TimelineGroupedSegmentType[]];
+}>();
 
 const isReadyForPreview = ref(false);
-const tempFiles = ref<GroupedSegment[]>([]);
+const tempFiles = ref<TimelineGroupedSegmentType[]>([]);
 const componentKey = ref(0);
 
 const totalDuration = computed(() => {
