@@ -25,12 +25,13 @@
         </div>
       </template>
 
+      <!-- Rendered Video Revisions -->
       <template v-else-if="activeTab == 'renders'">
         <BaseCard
           color="muted"
           :class="[
             'p-1 border-solid rounded border-[1px] border-gray-200 dark:border-muted-700',
-            'overflow-y-auto',
+            'overflow-y-auto overflow-x-visible',
             'h-[550px] w-[400px]',
           ]"
         >
@@ -50,13 +51,27 @@
                 <p class="text-xs">{{ revision.prompt }}</p>
               </div>
 
-              <BaseButton
+              <BaseButtonIcon
+                rounded="none"
+                size="sm"
+                :loading="revision.isPending"
+                :disabled="revision.isPending"
+                @click="mediaManager.removeVideoRevision(revision._id)"
+              >
+                <!-- Refresh -->
+                <Icon name="i-ph-trash-fill" class="size-5" />
+              </BaseButtonIcon>
+
+              <BaseButtonIcon
+                rounded="none"
+                size="sm"
                 :loading="revision.isPending"
                 :disabled="revision.isPending"
                 @click="mediaManager.fetchVideoLink(revision.fileId)"
               >
-                Play
-              </BaseButton>
+                <!-- Refresh -->
+                <Icon name="i-ph-play-fill" class="size-5" />
+              </BaseButtonIcon>
             </BaseCard>
           </template>
         </BaseCard>
@@ -86,8 +101,6 @@ const tabs = [
   { label: "Timeline", value: "timeline" },
   { label: "Renders", value: "renders" },
 ];
-
-const activeRevision = ref<VideoRevisionType>();
 
 function generateTimeline() {
   isGeneratingTimeline.value = true;

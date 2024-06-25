@@ -6,7 +6,11 @@ const {
 } = require("@modular-rest/server");
 
 const { VIDEO_PROJECT } = require("../../config");
-const { projectDocTriggers, videoMediaTriggers } = require("./triggers");
+const {
+  projectDocTriggers,
+  videoMediaTriggers,
+  videoRevisionTriggers,
+} = require("./triggers");
 
 const groupedSegmentsSchema = new Schema({
   ids: [Number],
@@ -117,6 +121,7 @@ const videoRevision = new CollectionDefinition({
       ownerIdField: "userId",
     }),
   ],
+  triggers: videoRevisionTriggers,
 });
 
 module.exports = [projectCollection, videoMedia, videoRevision];

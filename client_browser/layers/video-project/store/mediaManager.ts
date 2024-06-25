@@ -271,6 +271,29 @@ export const useMediaManagerStore = defineStore("mediaManagerStore", () => {
       .getFileLink(fileDoc);
   }
 
+  async function removeVideoRevision(revisionId: string) {
+    if (!window.confirm("Are you sure you want to delete this revision?"))
+      return;
+
+    const revision = videoRevisions.value.find((rev) => rev._id === revisionId);
+
+    return dataProvider
+      .removeOne({
+        database: VIDEO_PROJECT_DATABASE.DATABASE,
+        collection: VIDEO_PROJECT_DATABASE.VIDEO_REVISION,
+        query: {
+          _id: revisionId,
+          userId: authUser.value?.id,
+          fileId: revision?.fileId,
+        },
+      })
+      .then(() => {
+        videoRevisions.value = videoRevisions.value.filter(
+          (rev) => rev._id !== revisionId
+        );
+      });
+  }
+
   return {
     projectId,
     projectFiles,
@@ -292,5 +315,6 @@ export const useMediaManagerStore = defineStore("mediaManagerStore", () => {
     updateProjectTimeLine,
     generateTimeline,
     fetchVideoLink,
+    removeVideoRevision,
   };
 });

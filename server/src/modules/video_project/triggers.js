@@ -55,6 +55,14 @@ module.exports.videoMediaTriggers = [
   }),
 ];
 
+module.exports.videoRevisionTriggers = [
+  new DatabaseTrigger("remove-one", async ({ query, queryResult }) => {
+    const { _id, fileId } = query;
+
+    removeFile(fileId).catch((err) => {});
+  }),
+];
+
 module.exports.projectFileTriggers = [
   /*
   When a video file is uploaded, 
