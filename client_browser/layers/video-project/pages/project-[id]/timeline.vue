@@ -19,7 +19,11 @@
             @update:modelValue="mediaManager.updateProjectTimeLine"
           />
 
-          <BaseButton @click="renderTimeLine" :loading="isRenderingTimeline">
+          <BaseButton
+            class="mt-2"
+            @click="renderTimeLine"
+            :loading="isRenderingTimeline"
+          >
             Render
           </BaseButton>
         </div>
@@ -83,9 +87,7 @@
 </template>
 
 <script setup lang="ts">
-import { Types } from "@modular-rest/client";
 import { useMediaManagerStore } from "../../store/mediaManager";
-import type { VideoRevisionType } from "../../types/project.type";
 const mediaManager = useMediaManagerStore();
 
 definePageMeta({
