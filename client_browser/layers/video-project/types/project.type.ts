@@ -21,7 +21,7 @@ export type ProjectType = {
   timeline: [TimelineGroupedSegmentType];
 };
 
-export type Segment = {
+export type SegmentType = {
   _id: string;
   id: number;
   start: number;
@@ -47,7 +47,7 @@ export type VideoMediaType = {
     size: string;
     [key: string]: string;
   }; // Consider defining a more specific type if the format structure is known
-  segments: Segment[];
+  segments: SegmentType[];
   groupedSegments: GroupedSegment[];
 };
 

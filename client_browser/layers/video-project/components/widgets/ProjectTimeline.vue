@@ -65,27 +65,11 @@
           </div>
 
           <!-- Segment detail -->
-          <BaseCard class="p-2 w-96 cursor-pointer flex items-center space-x-2">
-            <div class="flex-1">
-              <p
-                class="text-sm select-none"
-                :dir="isRTL('persian') ? 'rtl' : 'ltr'"
-              >
-                {{ element.description }}
-              </p>
-            </div>
-
-            <BaseButtonIcon
-              rounded="none"
-              size="sm"
-              data-nui-tooltip="Remove File"
-              data-nui-tooltip-position="left"
-              @click="onRemove(element._id)"
-            >
-              <!-- Refresh -->
-              <Icon name="i-ph-trash-fill" class="size-5" />
-            </BaseButtonIcon>
-          </BaseCard>
+          <WidgetsTimelineGroupedSegmentCard
+            class="p-2"
+            :group="element"
+            @remove="onRemove"
+          />
         </div>
       </template>
     </draggable>
@@ -95,9 +79,6 @@
 <script setup lang="ts">
 import draggable from "vuedraggable";
 import type { TimelineGroupedSegmentType } from "../../types/project.type";
-import { isRTL } from "../../helpers/languages";
-
-import { useMediaManagerStore } from "../../store/mediaManager";
 
 const props = defineProps({
   title: String,
