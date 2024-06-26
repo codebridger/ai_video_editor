@@ -3,21 +3,18 @@ const {
   storeFile,
   getFilePath,
 } = require("@modular-rest/server");
-const fs = require("fs");
-const videoEditorCaptionBasedChain = require("../../chains/video-editor-caption-based");
+
 const {
   exportVideoBySegments,
   extractGroupedSegments,
 } = require("./mediaProcessor");
+
 const {
-  getVideoMediaDocsByFileIds,
   getVideoProjectModels,
   findProjectById,
   extractSegmentsWithFilePathFromProjectTimeline,
 } = require("./service");
 
-const contextChain = require("../../chains/segment-grouper-chain");
-const { sleep } = require("../../helpers/promis");
 const timelineChain = require("../../chains/video-editor-grouped-segment-based");
 
 module.exports.functions = [
