@@ -15,6 +15,7 @@ import {
   type VideoMediaType,
   type VideoRevisionType,
 } from "../types/project.type";
+import { sleep } from "../helpers/promise";
 
 export const useMediaManagerStore = defineStore("mediaManagerStore", () => {
   const projectId = ref<string>("");
@@ -83,6 +84,7 @@ export const useMediaManagerStore = defineStore("mediaManagerStore", () => {
         database: VIDEO_PROJECT_DATABASE.DATABASE,
         collection: VIDEO_PROJECT_DATABASE.VIDEO_MEDIA,
         query: { projectId },
+        options: { sort: { creation_time: 1 } },
       })
       .then((medias) => {
         processedVideoMediaList.value = medias;
@@ -108,14 +110,17 @@ export const useMediaManagerStore = defineStore("mediaManagerStore", () => {
         collection: VIDEO_PROJECT_DATABASE.VIDEO_MEDIA,
         query: { fileId },
       })
-      .then((medias) => {
+      .then((media) => {
+        if (!media) return null;
+
         const index = processedVideoMediaList.value.findIndex(
           (media) => media.fileId === fileId
         );
+
         if (index !== -1) {
-          processedVideoMediaList.value[index] = medias;
+          processedVideoMediaList.value[index] = media;
         } else {
-          processedVideoMediaList.value.push(medias);
+          processedVideoMediaList.value.push(media);
         }
       });
   }
@@ -156,11 +161,15 @@ export const useMediaManagerStore = defineStore("mediaManagerStore", () => {
         },
         projectId
       )
-      .then((fileDoc) => {
+      .then(async (fileDoc) => {
         projectFiles.value.push(fileDoc);
         delete uploadProgressList.value[sessionId];
 
-        return fetchVideoMediaByFileId(fileDoc._id);
+        let fetched = false;
+        while (!fetched) {
+          sleep(500);
+          fetched = !!(await fetchVideoMediaByFileId(fileDoc._id));
+        }
       })
       .catch((error) => {
         delete uploadProgressList.value[sessionId];

@@ -1,13 +1,11 @@
-const { getFilePath, getCollection } = require("@modular-rest/server");
+const { getFilePath } = require("@modular-rest/server");
 const fluentFfmpeg = require("fluent-ffmpeg");
 const path = require("path");
 const OpenAI = require("openai");
 const fs = require("fs");
-const { VIDEO_PROJECT } = require("../../config");
 const contextChain = require("../../chains/segment-grouper-chain");
 const { getVideoProjectModels } = require("./service");
 const { createFolder, safeUnlink } = require("../../helpers/file");
-const { sleep } = require("../../helpers/promis");
 
 const temptDir = path.join(require.main?.path || process.cwd(), "..", "temp");
 
@@ -18,15 +16,19 @@ async function processVideo(fileDoc) {
   let language = "";
   let segments = [];
   let groupedSegments = [];
-  let formatProp = {};
-  let isProcessed = false;
+  let isProcessed = true;
 
   const { videoMediaModel } = getVideoProjectModels();
+  const filePath = await getFilePath(id);
+
+  // Get format properties
+  const formatProp = await getFormatProperties(filePath);
 
   const videoMediaDoc = await videoMediaModel.create({
     fileId: id,
     originalName,
     projectId: tag,
+    creation_time: (formatProp.tags || {}).creation_time,
     format: formatProp,
     isProcessed,
     segments,
@@ -34,8 +36,6 @@ async function processVideo(fileDoc) {
   });
 
   try {
-    const filePath = await getFilePath(id);
-
     // Generate audio from the video
     const outputFile = await generateAudio(filePath);
 
@@ -55,8 +55,6 @@ async function processVideo(fileDoc) {
     // get grouped segments
     groupedSegments = await extractGroupedSegments(segments);
 
-    // Get format properties
-    formatProp = await getFormatProperties(filePath);
     isProcessed = true;
   } catch (error) {
     console.error("Error processing video " + id, error);
@@ -71,7 +69,9 @@ async function processVideo(fileDoc) {
         fileId: id,
         fileName,
         projectId: tag,
-        format: formatProp,
+        format: {
+          creation_time: (formatProp.tags || {}).creation_time,
+        },
         isProcessed,
         segments,
         language,
@@ -132,7 +132,7 @@ async function getTranscriptSegments(filePath) {
   const transcription = await openai.audio.transcriptions.create({
     file: fs.createReadStream(filePath),
     model: "whisper-1",
-    // language: "fa",
+    language: "fa",
     response_format: "verbose_json",
     timestamp_granularities: ["segment"],
     temperature: 0.0,

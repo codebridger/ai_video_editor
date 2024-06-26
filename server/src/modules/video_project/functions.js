@@ -46,6 +46,7 @@ module.exports.functions = [
 
       const projectVideoMedia = await videoMediaModel
         .find({ projectId })
+        .sort({ creation_time: 1 })
         .exec();
 
       let groupedSegments = [];

@@ -65,6 +65,7 @@ const videoMedia = new CollectionDefinition({
         type: Object,
         default: {},
       },
+      creation_time: Date,
       // Segments:
       // https://platform.openai.com/docs/api-reference/audio/createTranscription
       segments: [
