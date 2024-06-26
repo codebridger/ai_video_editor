@@ -34,6 +34,11 @@ const app = createRest({
   staticPath: {
     rootDir: path.join(__dirname, "..", "uploads"),
     rootPath: "/assets",
+    setHeaders: (res, path, stats) => {
+      if (path.endsWith(".mp4")) {
+        res.setHeader("Accept-Ranges", "bytes");
+      }
+    },
   },
   koaBodyOptions: {
     formidable: {
