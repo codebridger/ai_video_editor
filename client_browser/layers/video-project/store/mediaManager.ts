@@ -188,7 +188,11 @@ export const useMediaManagerStore = defineStore("mediaManagerStore", () => {
       .removeOne({
         database: VIDEO_PROJECT_DATABASE.DATABASE,
         collection: VIDEO_PROJECT_DATABASE.VIDEO_MEDIA,
-        query: { _id: videoMedia?._id, fileId },
+        query: {
+          _id: videoMedia?._id,
+          fileId,
+          lowQualityFileId: videoMedia.lowQualityFileId,
+        },
       })
       .then(() => {
         processedVideoMediaList.value = processedVideoMediaList.value.filter(

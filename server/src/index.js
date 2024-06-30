@@ -42,7 +42,7 @@ const app = createRest({
   },
   koaBodyOptions: {
     formidable: {
-      maxFileSize: 1024 * 1024 * 1024,
+      maxFileSize: 6144 * 1024 * 1024,
     },
   },
   // staticPath: {

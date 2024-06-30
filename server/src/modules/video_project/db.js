@@ -55,6 +55,7 @@ const videoMedia = new CollectionDefinition({
   schema: new Schema(
     {
       fileId: String,
+      lowQualityFileId: String,
       fileName: String,
       projectId: String,
       isProcessed: Boolean,

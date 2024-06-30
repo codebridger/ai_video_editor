@@ -1,4 +1,4 @@
-const { getFilePath } = require("@modular-rest/server");
+const { getFilePath, storeFile, removeFile } = require("@modular-rest/server");
 const fluentFfmpeg = require("fluent-ffmpeg");
 const path = require("path");
 const OpenAI = require("openai");
@@ -8,6 +8,7 @@ const { getVideoProjectModels } = require("./service");
 const { createFolder, safeUnlink } = require("../../helpers/file");
 
 const temptDir = path.join(require.main?.path || process.cwd(), "..", "temp");
+const processed_videos_dir = path.join(temptDir, "processed_videos");
 
 async function processVideo(fileDoc) {
   const { _id, originalName, fileName, owner, format, tag, size } = fileDoc;
@@ -16,9 +17,11 @@ async function processVideo(fileDoc) {
   let language = "";
   let segments = [];
   let groupedSegments = [];
+  let lowQualityFileId = "";
   let isProcessed = true;
 
   const { videoMediaModel } = getVideoProjectModels();
+
   const filePath = await getFilePath(id);
 
   // Get format properties
@@ -39,18 +42,32 @@ async function processVideo(fileDoc) {
     // Generate audio from the video
     const outputFile = await generateAudio(filePath);
 
-    // Get the transcript segments
-    segments = await getTranscriptSegments(outputFile)
-      .then((res) => {
-        language = res.language;
-        return res.segments.map((segment, index) => ({
-          ...segment,
-          id: index,
-        }));
-      })
-      .finally(() => {
-        safeUnlink(outputFile);
-      });
+    await Promise.all([
+      // Get the transcript segments
+      getTranscriptSegments(outputFile)
+        .then((res) => {
+          language = res.language;
+          return res.segments.map((segment, index) => ({
+            ...segment,
+            id: index,
+          }));
+        })
+        .then((res) => (segments = res))
+        .finally(() => safeUnlink(outputFile)),
+
+      // Generate low quality video
+      generateLowQualityVideo(filePath)
+        .then(getFileInformation)
+        .then((fileInfo) => {
+          return storeFile({
+            file: fileInfo,
+            ownerId: owner,
+            tag: tag + "_low",
+            removeFileAfterStore: true,
+          });
+        })
+        .then((fileDoc) => (lowQualityFileId = fileDoc._id.toString())),
+    ]);
 
     // get grouped segments
     groupedSegments = await extractGroupedSegments(segments);
@@ -67,6 +84,7 @@ async function processVideo(fileDoc) {
       { _id: videoMediaDoc._id },
       {
         fileId: id,
+        lowQualityFileId,
         fileName,
         projectId: tag,
         format: {
@@ -84,15 +102,42 @@ async function processVideo(fileDoc) {
     });
 }
 
-function generateAudio(filePath) {
-  const outputDir = path.join(temptDir, "processed_videos");
-
+async function generateLowQualityVideo(filePath) {
   const _id = path.basename(filePath, path.extname(filePath));
 
-  const outputFile = path.join(temptDir, "processed_videos", `${_id}.mp3`);
+  const outputFile = path.join(processed_videos_dir, `${_id}_low.mp4`);
 
   return new Promise(async (resolve, reject) => {
-    await createFolder(outputDir);
+    await createFolder(processed_videos_dir);
+
+    fluentFfmpeg(filePath)
+      .videoCodec("libx264")
+      .audioCodec("aac")
+      .size("640x?") // 640 pixels wide, preserve aspect ratio
+      .withOutputFps(24) // 24 frames per second
+      // .videoBitrate("500k")
+      .output(outputFile)
+      .on("error", (err) => {
+        console.error(`video convert error: ${err.message}`);
+        reject(err);
+      })
+      .on("progress", (progress) => {
+        // console.log(`Processing video: ${progress.percent}%`);
+      })
+      .on("end", () => {
+        resolve(outputFile);
+      })
+      .run();
+  });
+}
+
+function generateAudio(filePath) {
+  const _id = path.basename(filePath, path.extname(filePath));
+
+  const outputFile = path.join(processed_videos_dir, `${_id}.mp3`);
+
+  return new Promise(async (resolve, reject) => {
+    await createFolder(processed_videos_dir);
 
     fluentFfmpeg(filePath)
       .audioChannels(1)
@@ -298,6 +343,28 @@ async function exportVideoBySegments(
     });
 }
 
+/**
+ * Asynchronously retrieves detailed information about a media file, including its MIME type, name, size, and path.
+ *
+ * This function analyzes a media file specified by `filePath` to extract its codec information using `fluent-ffmpeg`.
+ * It then maps the codec to a MIME type for easier handling in web contexts. If the codec is not recognized, it defaults
+ * to "application/octet-stream". The function also retrieves the file's size and name from the file system.
+ *
+ * @param {string} filePath - The path to the media file to be analyzed.
+ * @returns {Promise<{path: string, type: string, name: string, size: number}>} A promise that resolves with an object containing:
+ *          - `path`: The full path to the media file.
+ *          - `type`: The MIME type of the media file, derived from its codec.
+ *          - `name`: The name of the file, including its extension.
+ *          - `size`: The size of the file in bytes.
+ *          If an error occurs during the analysis, the promise is rejected with the error.
+ *
+ * @example
+ * getFileInformation("/path/to/video.mp4").then(fileInfo => {
+ *   console.log(fileInfo);
+ * }).catch(error => {
+ *   console.error("Error getting file information:", error);
+ * });
+ */
 function getFileInformation(filePath) {
   function getMimeType(codec_name) {
     const codecToMimeMap = {
@@ -339,6 +406,7 @@ function getFileInformation(filePath) {
     });
   });
 }
+
 module.exports = {
   processVideo,
   exportVideoBySegments,

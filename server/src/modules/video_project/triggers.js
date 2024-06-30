@@ -22,6 +22,7 @@ module.exports.projectDocTriggers = [
       .then((mediaFile) => {
         mediaFile.forEach((file) => {
           removeFile(file.fileId).catch((err) => {});
+          removeFile(file.lowQualityFileId).catch((err) => {});
         });
       });
 
@@ -41,17 +42,27 @@ module.exports.projectDocTriggers = [
     // Remove all revisions
     await videoRevisionModel.deleteMany({ projectId: id }).exec();
   }),
+
+  new DatabaseTrigger("update-one", async ({ query, queryResult }) => {
+    const id = query._id;
+
+    const { videoMediaModel, videoRevisionModel } =
+      projectService.getVideoProjectModels();
+
+    if (query.$set?.timeline === undefined) return;
+  }),
 ];
 
 module.exports.videoMediaTriggers = [
   new DatabaseTrigger("remove-one", async ({ query, queryResult }) => {
-    const { _id, fileId } = query;
+    const { _id, fileId, lowQualityFileId } = query;
 
     const { videoMediaModel, videoRevisionModel } =
       projectService.getVideoProjectModels();
 
     // Remove all files
     removeFile(fileId).catch((err) => {});
+    removeFile(lowQualityFileId).catch((err) => {});
   }),
 ];
 

@@ -39,6 +39,7 @@ export type GroupedSegment = {
 export type VideoMediaType = {
   _id: string;
   fileId: string;
+  lowQualityFileId: string;
   fileName: string;
   projectId: string;
   isProcessed: boolean;
