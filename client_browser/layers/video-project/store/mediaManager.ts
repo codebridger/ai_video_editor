@@ -23,7 +23,7 @@ export const useMediaManagerStore = defineStore("mediaManagerStore", () => {
   // The uploaded files for the project, Native cms files
   const projectFiles = ref<Types.FileDocument[]>([]);
   // The files are bing uploaded by the user
-  const uploadList = ref<FileList | null>(null);
+  const uploadList = ref<File[]>([]);
   // The Progress of the files being uploaded
   const uploadProgressList = ref<{ [key: string]: number }>({});
 
@@ -63,7 +63,7 @@ export const useMediaManagerStore = defineStore("mediaManagerStore", () => {
 
   function fetchProjectFiles(projectId: string) {
     projectFiles.value = [];
-    uploadList.value = null;
+    uploadList.value = [];
     uploadProgressList.value = {};
 
     return fileProvider
@@ -122,6 +122,8 @@ export const useMediaManagerStore = defineStore("mediaManagerStore", () => {
         } else {
           processedVideoMediaList.value.push(media);
         }
+
+        return media;
       });
   }
 
@@ -167,9 +169,13 @@ export const useMediaManagerStore = defineStore("mediaManagerStore", () => {
 
         let fetched = false;
         while (!fetched) {
-          sleep(500);
+          sleep(1000);
           fetched = !!(await fetchVideoMediaByFileId(fileDoc._id));
         }
+
+        uploadList.value = uploadList.value.filter(
+          (file) => file.name !== fileName
+        );
       })
       .catch((error) => {
         delete uploadProgressList.value[sessionId];
@@ -316,6 +322,7 @@ export const useMediaManagerStore = defineStore("mediaManagerStore", () => {
     videoRevisions,
     activeVideoForPlayer,
     initialize,
+    getUploadSessionId,
     startUploadSession,
     checkUploadProgress,
     fetchProjectFiles,

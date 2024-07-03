@@ -3,16 +3,12 @@
     <BaseFullscreenDropfile
       icon="ph:image-duotone"
       :filter-file-dropped="(file) => file.type.startsWith('image')"
-      @drop="
-        (value) => {
-          mediaManagerStore.uploadList = value;
-        }
-      "
+      @drop="addUploadList"
     />
 
     <BaseInputFileHeadless
       v-slot="{ open, remove, drop, files }"
-      v-model="mediaManagerStore.uploadList"
+      @update:modelValue="addUploadList"
       multiple
     >
       <!-- Controls -->
@@ -104,4 +100,18 @@
 import { useMediaManagerStore } from "../../store/mediaManager";
 
 const mediaManagerStore = useMediaManagerStore();
+
+function addUploadList(files: FileList | null) {
+  if (!files) {
+    return;
+  }
+
+  Array.from(files).forEach((file) => {
+    if (mediaManagerStore.uploadList.some((f) => f.name === file.name)) {
+      return;
+    }
+
+    mediaManagerStore.uploadList.push(file);
+  });
+}
 </script>
