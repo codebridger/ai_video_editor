@@ -251,7 +251,8 @@ async function extractSegment(filePath, start, duration, outputFile) {
       .duration(duration)
       .videoCodec("libx264") // Re-encode video to H.264
       .audioCodec("aac") // Re-encode audio to AAC
-      .size("1408x1872") // Standardize resolution
+      .size("640x480") // Standardize resolution
+      .autopad(true, "black") // Center video and add black padding without stretching
       .fps(30) // Standardize frame rate
       .output(outputFile)
       .on("end", () => resolve("Segment extracted successfully"))
