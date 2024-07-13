@@ -5,7 +5,7 @@ const {
   removeFile,
 } = require("@modular-rest/server/src");
 const projectService = require("./service");
-const mediaProcessor = require("./mediaProcessor");
+const mediaProcessor = require("./media-processor.service");
 const { VIDEO_PROJECT } = require("../../config");
 
 module.exports.projectDocTriggers = [

@@ -43,7 +43,7 @@ function getBaseChain() {
       .array(z.number().describe("id of the segment"))
       .describe("List of segment ids."),
   });
-  const modelWithStructuredOutput = geminiModel.withStructuredOutput(
+  const modelWithStructuredOutput = openaiModel.withStructuredOutput(
     segmentIdsSchema,
     { includeRaw: true }
   );
@@ -72,7 +72,14 @@ async function invoke({ editing_request, grouped_segments = [] }) {
       total_segments: tempSegments.length - 1,
     })
     .then(({ raw, parsed }) => {
-      return parsed.partIds;
+      if (!parsed) {
+        console.log(
+          "Raw Output on video-editor-grouped-segment-based",
+          raw.content
+        );
+      }
+
+      return parsed?.partIds || [];
     });
 
   console.log("partIds", partIds);

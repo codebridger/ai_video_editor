@@ -34,57 +34,6 @@ async function getVideoMediaDocsByFileIds(fileIds) {
     });
 }
 
-/**
- * Asynchronously extracts segments along with their file paths from a project's timeline.
- *
- * This function retrieves a project by its ID and iterates over its timeline to extract
- * information about each segment. For each segment in the timeline, it finds the corresponding
- * video document to get the file path and then constructs an array of objects containing
- * the video file path, start time, and end time of each segment.
- *
- * Note: This function assumes the existence of `getVideoProjectModels`, which provides the models
- * for querying the database, and `getFilePath`, which retrieves the file path for a given fileId.
- *
- * @param {string} projectId - The ID of the project from which to extract segment information.
- * @returns {Promise<Array<{videoFilePath: string, start: number, end: number, text:string}>>} A promise that resolves to an array of objects,
- *          each object containing the `videoFilePath`, `start`, and `end` properties for a segment.
- */
-async function extractSegmentsWithFilePathFromProjectTimeline(projectId) {
-  const { videoMediaModel, projectModel } = getVideoProjectModels();
-
-  const projectDoc = await projectModel.findOne({ _id: projectId });
-
-  const streamSegments = [];
-
-  for (const groupedSegment of projectDoc.toObject().timeline) {
-    if (!groupedSegment.ids || groupedSegment.ids.length === 0) {
-      continue;
-    }
-
-    const videoDoc = await videoMediaModel
-      .findOne({ _id: groupedSegment.processedVideoId })
-      .then((doc) => doc.toObject());
-
-    for (const segmentId of groupedSegment.ids) {
-      const segmentIndex = videoDoc.segments.findIndex(
-        (seg) => seg.id === segmentId
-      );
-
-      const captionSegmentData = videoDoc.segments[segmentIndex];
-
-      streamSegments.push({
-        videoFilePath: await getFilePath(videoDoc.fileId),
-        fileId: videoDoc.fileId,
-        start: captionSegmentData.start,
-        end: captionSegmentData.end,
-        text: captionSegmentData.text,
-      });
-    }
-  }
-
-  return streamSegments;
-}
-
 function getVideoProjectModels() {
   return {
     projectModel: getCollection(
@@ -106,5 +55,4 @@ module.exports = {
   findProjectById,
   getVideoMediaDocsByFileIds,
   getVideoProjectModels,
-  extractSegmentsWithFilePathFromProjectTimeline,
 };

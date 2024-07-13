@@ -34,6 +34,10 @@ const projectCollection = new CollectionDefinition({
       title: String,
       userId: String,
       timeline: [TimelineGroupedSegmentTypesSchema],
+      timelinePreview: {
+        fileId: String,
+        isPending: Boolean,
+      },
     },
     { timestamps: true }
   ),
