@@ -1,4 +1,8 @@
-const { getFilePath, storeFile } = require("@modular-rest/server/src");
+const {
+  getFilePath,
+  storeFile,
+  removeFile,
+} = require("@modular-rest/server/src");
 const { getVideoProjectModels, findProjectById } = require("./service");
 const timelineChain = require("../../chains/video-editor-grouped-segment-based");
 const { exportVideoBySegments } = require("./video-engine.service");
@@ -116,7 +120,7 @@ async function generateVideoRevision({ prompt, projectId, userId }) {
 
   console.time("timeline_render_took");
 
-  const projectDoc = await findProjectById(projectId);
+  const projectDoc = await findProjectById(projectId, userId);
 
   if (!projectDoc) {
     throw new Error("No project found with the given id");
@@ -190,8 +194,98 @@ async function generateVideoRevision({ prompt, projectId, userId }) {
   return newRevision.toObject();
 }
 
+async function generateTimelinePreview({ projectId, userId }) {
+  if (!projectId || !userId) {
+    throw new Error("prompt and ids is required. userId is required.");
+  }
+
+  console.time("timeline_render_took");
+
+  const projectDoc = await findProjectById(projectId, userId);
+
+  if (!projectDoc) {
+    throw new Error("No project found with the given id");
+  } else if (projectDoc.userId !== userId) {
+    throw new Error("User does not have access to the project");
+  }
+
+  // Remove old preview
+  if (projectDoc.timelinePreview?.fileId) {
+    await removeFile(projectDoc.timelinePreview.fileId).catch((error) => {});
+  }
+
+  const { projectModel } = getVideoProjectModels();
+
+  // Set the preview as pending
+  await projectModel
+    .updateOne(
+      { _id: projectId },
+      {
+        $set: {
+          "timelinePreview.isPending": true,
+        },
+      }
+    )
+    .exec();
+
+  // extract segments
+  const extractedSegments =
+    await extractSegmentsWithFilePathFromProjectTimeline(projectId);
+
+  //
+  // Export the video from the revision
+  //
+
+  return exportVideoBySegments(extractedSegments)
+    .then(async (fileForSaving) => {
+      const exportedFileId = await storeFile({
+        file: fileForSaving,
+        ownerId: userId,
+        tag: projectId + "_preview",
+        removeFileAfterStore: true,
+      })
+        .then((savedFile) => savedFile._id.toString())
+        .catch((error) => "");
+
+      await projectModel
+        .updateOne(
+          {
+            _id: projectId,
+          },
+          {
+            $set: {
+              timelinePreview: {
+                fileId: exportedFileId,
+                isPending: false,
+              },
+            },
+          }
+        )
+        .exec();
+    })
+    .catch(async (error) => {
+      console.error("Error exporting video revision", error);
+      await projectModel
+        .updateOne(
+          {
+            _id: projectId,
+          },
+          {
+            $set: {
+              "timelinePreview.isPending": false,
+            },
+          }
+        )
+        .exec();
+    })
+    .finally(() => {
+      console.timeEnd("timeline_render_took");
+    });
+}
+
 module.exports = {
   extractSegmentsWithFilePathFromProjectTimeline,
   generateTimelineByPrompt,
   generateVideoRevision,
+  generateTimelinePreview,
 };

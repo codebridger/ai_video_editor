@@ -199,6 +199,14 @@ async function getTranscriptSegments(filePath) {
   };
 }
 
+/**
+ * Extracts and groups segments based on their context, generating a description and calculating the duration for each group.
+ *
+ * @param {Array<{text: string, start: number, end: number}>} segments - An array of segment objects, where each segment includes `text`, `start`, and `end` properties.
+ * @returns {Promise<Array<{ids: Array<number>, duration: number, description: string}>>} A promise that resolves to an array of grouped segment objects. Each object in the array includes
+ *                            `ids` (an array of indices referring to the original segments), `duration` (the total duration of all
+ *                            segments in the group), and `description` (a string description of the group).
+ */
 async function extractGroupedSegments(segments) {
   let groupedSegments = [];
 

@@ -6,6 +6,7 @@ const { getVideoProjectModels } = require("./service");
 
 const {
   generateTimelineByPrompt,
+  generateTimelinePreview,
   generateVideoRevision,
 } = require("./timeline.service");
 
@@ -15,8 +16,18 @@ module.exports.functions = [
   defineFunction({
     name: "generateTimeline",
     permissionTypes: ["user_access"],
-    callback: ({ projectId, prompt, userId }) => {
+    callback: ({ projectId, userId }) => {
       return generateTimelineByPrompt({ projectId, prompt, userId });
+    },
+  }),
+
+  // Render the video based on the timeline
+  // and return the revision document
+  defineFunction({
+    name: "generateTimelinePreview",
+    permissionTypes: ["user_access"],
+    callback: ({ projectId, userId }) => {
+      return generateTimelinePreview({ projectId, userId });
     },
   }),
 

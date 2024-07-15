@@ -32,6 +32,10 @@ export const useMediaManagerStore = defineStore("mediaManagerStore", () => {
   const processedVideoMediaList = ref<VideoMediaType[]>([]);
 
   const timeline = ref<TimelineGroupedSegmentType[]>([]);
+  const timelinePreview = ref<{ fileId: string; isPending: boolean }>({
+    fileId: "",
+    isPending: false,
+  });
 
   const activeVideoForPlayer = ref<string | null>(null);
 
@@ -58,6 +62,11 @@ export const useMediaManagerStore = defineStore("mediaManagerStore", () => {
       })
       .then((project) => {
         timeline.value = project.timeline;
+
+        timelinePreview.value = project.timelinePreview || {
+          fileId: "",
+          isPending: false,
+        };
       });
   }
 
@@ -262,7 +271,7 @@ export const useMediaManagerStore = defineStore("mediaManagerStore", () => {
       });
   }
 
-  function renderTimeline(context: { prompt: string }) {
+  function generateVideoRevision(context: { prompt: string }) {
     return functionProvider.run<VideoRevisionType>({
       name: "generateVideoRevision",
       args: {
@@ -271,6 +280,23 @@ export const useMediaManagerStore = defineStore("mediaManagerStore", () => {
         userId: authUser.value?.id,
       },
     });
+  }
+
+  function generateTimelinePreview() {
+    return functionProvider
+      .run<void>({
+        name: "generateTimelinePreview",
+        args: {
+          projectId: projectId.value,
+          userId: authUser.value?.id,
+        },
+      })
+      .then(() => {
+        return fetchProjectTimeLine(projectId.value);
+      })
+      .then(() => {
+        return fetchVideoLink(timelinePreview.value.fileId);
+      });
   }
 
   async function fetchVideoLink(fileId: string) {
@@ -328,7 +354,8 @@ export const useMediaManagerStore = defineStore("mediaManagerStore", () => {
     fetchProjectFiles,
     removeProjectFile,
     fetchVideoRevisions,
-    renderTimeline,
+    generateVideoRevision,
+    generateTimelinePreview,
     fetchVideoMedias,
     fetchVideoMediaByFileId,
     generateGroupedSegments,

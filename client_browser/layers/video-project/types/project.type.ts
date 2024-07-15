@@ -19,6 +19,10 @@ export type ProjectType = {
   title: string;
   userId: string;
   timeline: [TimelineGroupedSegmentType];
+  timelinePreview: {
+    fileId: string;
+    isPending: boolean;
+  }
 };
 
 export type SegmentType = {

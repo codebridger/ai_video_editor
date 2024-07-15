@@ -1,14 +1,16 @@
 const { getCollection, getFilePath } = require("@modular-rest/server");
 const { VIDEO_PROJECT } = require("../../config");
 
-async function findProjectById(id) {
+async function findProjectById(id, userId = null) {
   const model = getCollection(
     VIDEO_PROJECT.DATABASE,
     VIDEO_PROJECT.PROJECT_COLLECTION
   );
 
+  const query = userId ? { _id: id, userId } : { _id: id };
+
   return model
-    .findOne({ _id: id })
+    .findOne(query)
     .exec()
     .then((project) => project.toObject())
     .catch((err) => null);

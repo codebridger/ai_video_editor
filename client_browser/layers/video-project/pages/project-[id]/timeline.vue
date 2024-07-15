@@ -21,10 +21,10 @@
 
           <BaseButton
             class="mt-2"
-            @click="renderTimeLine"
-            :loading="isRenderingTimeline"
+            @click="generateTimelinePreview"
+            :loading="isRenderingTimelinePreview"
           >
-            Render
+            Render Preview
           </BaseButton>
         </div>
       </template>
@@ -88,7 +88,10 @@
 
 <script setup lang="ts">
 import { useMediaManagerStore } from "../../store/mediaManager";
+import { useVideoProjects } from "../../store/videoProject";
+
 const mediaManager = useMediaManagerStore();
+const projectsStore = useVideoProjects();
 
 definePageMeta({
   layout: "project",
@@ -96,7 +99,8 @@ definePageMeta({
 
 const prompt = ref("Generate a 60 second video for Instagram reels.");
 const isGeneratingTimeline = ref(false);
-const isRenderingTimeline = ref(false);
+const isRenderingTimelinePreview = ref(false);
+const isGeneratingVideoRevision = ref(false);
 
 const activeTab = ref("timeline");
 const tabs = [
@@ -111,10 +115,10 @@ function generateTimeline() {
   });
 }
 
-async function renderTimeLine() {
-  isRenderingTimeline.value = true;
+async function generateVideoRevision() {
+  isGeneratingVideoRevision.value = true;
 
-  const newRevision = await mediaManager.renderTimeline({
+  const newRevision = await mediaManager.generateVideoRevision({
     prompt: prompt.value,
   });
 
@@ -137,6 +141,14 @@ async function renderTimeLine() {
     }
   }
 
-  isRenderingTimeline.value = false;
+  isGeneratingVideoRevision.value = false;
+}
+
+function generateTimelinePreview() {
+  isRenderingTimelinePreview.value = true;
+
+  mediaManager.generateTimelinePreview().finally(() => {
+    isRenderingTimelinePreview.value = false;
+  });
 }
 </script>
