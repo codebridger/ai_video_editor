@@ -73,7 +73,7 @@
           :list="media.groupedSegments"
           :group="{ name: 'grouped-segments', pull: 'clone', put: false }"
           item-key="_id"
-          :clone="clone"
+          :clone="cloneGroupedSegment"
         >
           <template
             #item="{
@@ -105,16 +105,11 @@
           :key="key"
           :list="media.segments"
           :group="{ name: 'grouped-segment', pull: 'clone', put: false }"
+          :clone="cloneCaptionAsGroupedSegment"
           item-key="_id"
         >
           <template
-            #item="{
-              element,
-              index,
-            }: {
-              element: GroupedSegment,
-              index: number,
-            }"
+            #item="{ element, index }: { element: SegmentType, index: number }"
           >
             <BaseCard class="p-2 flex items-end justify-between">
               <p class="text-sm select-none">
@@ -139,6 +134,7 @@ import type {
   GroupedSegment,
   VideoMediaType,
   TimelineGroupedSegmentType,
+  SegmentType,
 } from "../../types/project.type";
 import { isRTL } from "../../helpers/languages";
 
@@ -230,7 +226,7 @@ function fetchFfmpegProps() {
     });
 }
 
-function clone(element: GroupedSegment) {
+function cloneGroupedSegment(element: GroupedSegment) {
   const clone = JSON.parse(
     JSON.stringify(element)
   ) as TimelineGroupedSegmentType;
@@ -253,6 +249,31 @@ function clone(element: GroupedSegment) {
   }
 
   console.log(clone);
+
+  return clone;
+}
+
+function cloneCaptionAsGroupedSegment(element: SegmentType) {
+  const clone = {
+    _id: element._id,
+    description: element.text,
+    duration: element.end - element.start,
+    ids: [element.id],
+  } as TimelineGroupedSegmentType;
+
+  for (let i = 0; i < mediaManagerStore.processedVideoMediaList.length; i++) {
+    const video = mediaManagerStore.processedVideoMediaList[i];
+
+    for (let j = 0; j < video.segments.length; j++) {
+      const segment = video.segments[j];
+
+      if (segment._id === element._id) {
+        clone["processedVideoId"] = video._id;
+        clone["fileId"] = video.fileId;
+        break;
+      }
+    }
+  }
 
   return clone;
 }
