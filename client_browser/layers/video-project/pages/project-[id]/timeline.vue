@@ -23,6 +23,7 @@
             class="mt-2"
             @click="generateTimelinePreview"
             :loading="isRenderingTimelinePreview"
+            :disabled="mediaManager.timeline.length === 0"
           >
             Render Preview
           </BaseButton>
@@ -88,10 +89,8 @@
 
 <script setup lang="ts">
 import { useMediaManagerStore } from "../../store/mediaManager";
-import { useVideoProjects } from "../../store/videoProject";
 
 const mediaManager = useMediaManagerStore();
-const projectsStore = useVideoProjects();
 
 definePageMeta({
   layout: "project",

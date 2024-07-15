@@ -44,13 +44,36 @@ export const useMediaManagerStore = defineStore("mediaManagerStore", () => {
   function initialize(id: string) {
     projectId.value = id;
 
+    console.log("Initializing Media Manager Store", id);
+
     fetchProjectTimeLine(id);
     fetchProjectFiles(id);
     fetchVideoMedias(id);
     fetchVideoRevisions(id);
   }
 
+  function clear() {
+    projectId.value = "";
+    projectFiles.value = [];
+    uploadList.value = [];
+    uploadProgressList.value = {};
+    processedVideoMediaList.value = [];
+    timeline.value = [];
+    timelinePreview.value = {
+      fileId: "",
+      isPending: false,
+    };
+    activeVideoForPlayer.value = null;
+    videoRevisions.value = [];
+  }
+
   function fetchProjectTimeLine(id: string) {
+    timeline.value = [];
+    timelinePreview.value = {
+      fileId: "",
+      isPending: false,
+    };
+
     return dataProvider
       .findOne<ProjectType>({
         database: VIDEO_PROJECT_DATABASE.DATABASE,
@@ -67,6 +90,13 @@ export const useMediaManagerStore = defineStore("mediaManagerStore", () => {
           fileId: "",
           isPending: false,
         };
+
+        if (
+          timelinePreview.value.fileId &&
+          timelinePreview.value.fileId.length
+        ) {
+          fetchVideoLink(timelinePreview.value.fileId);
+        }
       });
   }
 
@@ -101,6 +131,8 @@ export const useMediaManagerStore = defineStore("mediaManagerStore", () => {
   }
 
   function fetchVideoRevisions(projectId: string) {
+    videoRevisions.value = [];
+
     return dataProvider
       .find<VideoRevisionType>({
         database: VIDEO_PROJECT_DATABASE.DATABASE,
@@ -295,7 +327,12 @@ export const useMediaManagerStore = defineStore("mediaManagerStore", () => {
         return fetchProjectTimeLine(projectId.value);
       })
       .then(() => {
-        return fetchVideoLink(timelinePreview.value.fileId);
+        if (
+          timelinePreview.value.fileId &&
+          timelinePreview.value.fileId.length
+        ) {
+          return fetchVideoLink(timelinePreview.value.fileId);
+        }
       });
   }
 
@@ -348,6 +385,7 @@ export const useMediaManagerStore = defineStore("mediaManagerStore", () => {
     videoRevisions,
     activeVideoForPlayer,
     initialize,
+    clear,
     getUploadSessionId,
     startUploadSession,
     checkUploadProgress,

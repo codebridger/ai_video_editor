@@ -29,7 +29,7 @@ async function extractSegmentsWithFilePathFromProjectTimeline(projectId) {
 
   const streamSegments = [];
 
-  for (const groupedSegment of projectDoc.toObject().timeline) {
+  for (const groupedSegment of projectDoc.toObject().timeline || []) {
     if (!groupedSegment.ids || groupedSegment.ids.length === 0) {
       continue;
     }
@@ -214,6 +214,10 @@ async function generateTimelinePreview({ projectId, userId }) {
     await removeFile(projectDoc.timelinePreview.fileId).catch((error) => {});
   }
 
+  // extract segments
+  const extractedSegments =
+    await extractSegmentsWithFilePathFromProjectTimeline(projectId);
+
   const { projectModel } = getVideoProjectModels();
 
   // Set the preview as pending
@@ -222,15 +226,16 @@ async function generateTimelinePreview({ projectId, userId }) {
       { _id: projectId },
       {
         $set: {
-          "timelinePreview.isPending": true,
+          "timelinePreview.fileId": "",
+          "timelinePreview.isPending": !!extractedSegments.length,
         },
       }
     )
     .exec();
 
-  // extract segments
-  const extractedSegments =
-    await extractSegmentsWithFilePathFromProjectTimeline(projectId);
+  if (extractedSegments.length === 0) {
+    return Promise.resolve();
+  }
 
   //
   // Export the video from the revision

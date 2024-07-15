@@ -16,7 +16,7 @@ module.exports.functions = [
   defineFunction({
     name: "generateTimeline",
     permissionTypes: ["user_access"],
-    callback: ({ projectId, userId }) => {
+    callback: ({ projectId, userId, prompt }) => {
       return generateTimelineByPrompt({ projectId, prompt, userId });
     },
   }),

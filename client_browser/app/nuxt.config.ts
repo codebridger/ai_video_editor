@@ -17,7 +17,9 @@ function getLocals(ext = ".js") {
 
 export default defineNuxtConfig({
   ssr: false,
-  devtools: { enabled: process.env.NODE_ENV === "development" },
+  devtools: {
+    enabled: false, // process.env.NODE_ENV === "development"
+  },
 
   app: {
     head: {

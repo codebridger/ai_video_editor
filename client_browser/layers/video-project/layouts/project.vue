@@ -6,7 +6,16 @@ const route = useRoute();
 
 onMounted(() => {
   const projectId = route.params.id as string;
-  mediaStore.initialize(projectId);
+
+  if (!projectId) {
+    window.alert("Project ID is missing, refresh the page.");
+  } else {
+    mediaStore.initialize(projectId);
+  }
+});
+
+onUnmounted(() => {
+  mediaStore.clear();
 });
 </script>
 

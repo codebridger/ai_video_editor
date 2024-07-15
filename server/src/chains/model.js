@@ -2,7 +2,7 @@ const { ChatOpenAI } = require("@langchain/openai");
 const { ChatGoogleGenerativeAI } = require("@langchain/google-genai");
 
 module.exports.openaiModel = new ChatOpenAI({
-  temperature: 0.5,
+  temperature: 1,
   model: "gpt-4o",
   // @ts-ignore
   apiKey: process.env.OPENAI_API_KEY,
