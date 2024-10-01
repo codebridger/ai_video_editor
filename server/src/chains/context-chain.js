@@ -3,6 +3,12 @@ const { ChatPromptTemplate } = require("@langchain/core/prompts");
 const { z } = require("zod");
 const { openaiModel, geminiModel } = require("./model");
 
+/**
+ * Extracts groups of segments based on their contextual relevance.
+ *
+ * This function takes an object containing caption segments and uses a schema to validate the structure of the segment IDs.
+ * It then creates a prompt template for the OpenAI model to break the given text list into contextually relevant groups.
+ */
 function extractGroupsBySegments({ caption_segments }) {
   const segmentIdsSchema = z.object({
     groups: z
@@ -24,14 +30,13 @@ function extractGroupsBySegments({ caption_segments }) {
       `
       Break the given text list into contextually relevant groups:
       - Analyze the context of each segment to determine its grouping.
-      - Each group should contain between 1 and 30 segments.
+      - Each group can maximum contain between 1 to 30 segments.
       - Create meaningful groups by analyzing the context of each segment.
       - Return a list of groups, where each group is a list of segment IDs.
       - The ID range is from 0 to {total_segments}.
       - Ensure that IDs are grouped based on context rather than just sequentially.
       - For example, if there are 10 segments, instead of grouping 1-5 and 6-10, group them based on their content. E.g., [0, 2, 3, 7, 8] might be one group if they share a common theme, and [1, 4, 5, 6, 9] another.
-      - Maximum 30 segments per group.
-      - Minimum 1 segment per group.
+
       `,
     ],
     [
@@ -53,7 +58,7 @@ function extractGroupsBySegments({ caption_segments }) {
       total_segments: caption_segments.length,
     })
     .then((parsed) => {
-      return parsed;
+      return parsed.groups;
     });
 }
 
@@ -62,18 +67,19 @@ function extractGroupDescription(lines = []) {
     [
       "system",
       `
-        Extract the most important keywords from the given text.
-        - Only return the keywords, separated by commas, to describe the essence of the video clip.
-        - Ensure the keywords are concise and relevant to the main themes and content of the clip.
-        - Use 3-10 words for each keyword.
-        - If the text is too short, return the same text.
-        - don't add any extra words like: here are the keywords, the keywords are, etc.
+        Take [lines] and generate a ready to use short description for the following text list.
+
+        Consider the following:
+        1. These lines are scene scripts of a video, and you need to generate a description for an easy understanding of the content.
+        2. just add the matters part and don't add things like: this text is about, this text is for, etc.
+        3. use action words to start the description.
+        4. use the same language of the text list.
       `,
     ],
     [
       "human",
       `
-      Please provide a description for the following video captions:
+      [Lines]
       {lines}
       `,
     ],

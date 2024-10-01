@@ -1,9 +1,7 @@
 const { getFilePath, storeFile, removeFile } = require("@modular-rest/server");
 const fluentFfmpeg = require("fluent-ffmpeg");
-const path = require("path");
-const OpenAI = require("openai");
-const fs = require("fs");
-const contextChain = require("../../chains/segment-grouper-chain");
+
+const contextChain = require("../../chains/context-chain");
 const { getVideoProjectModels } = require("./service");
 const { createFolder, safeUnlink } = require("../../helpers/file");
 const {
@@ -161,11 +159,9 @@ async function extractGroupedSegments(segments) {
 
   // get grouped segments
   if (segments.length > 1) {
-    groupedSegments = await contextChain
-      .extractGroupsBySegments({
-        caption_segments: segments,
-      })
-      .then(({ groups }) => groups);
+    groupedSegments = await contextChain.extractGroupsBySegments({
+      caption_segments: segments,
+    });
 
     // generate group description
     for (const group of groupedSegments) {

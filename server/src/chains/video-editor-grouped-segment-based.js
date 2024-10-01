@@ -8,19 +8,19 @@ const prompt = ChatPromptTemplate.fromMessages([
     "system",
     `
     You are a story editor for a video production company.
-    what you have is a sort of script with part numbers, durations, and descriptions of each.
+    what you have is a sort of script includes sequence-number, durations, and descriptions of each one.
 
     Instructions:
     1. check the [Task Request] to understand what kind of video you need to create.
     2. Combine the segments based on their context to create a cohesive video.
-    3. The output should be a list of part ids in the order they should be combined.
+    3. The output should be a list of sequence-ids.
 
     Example Text List:
-    part 1, 10 seconds, desc: Segment about nature
-    part 2, 5 seconds, desc: Segment about technology
-    part 3, 7 seconds, desc: introducing my self as a developer 
-    part 4, 3 seconds, desc: saying hello to the audience
-    part 5, 8 seconds, desc: Saying goodbye to the audience
+    sequence 1, 10 seconds, desc: Segment about nature
+    sequence 2, 5 seconds, desc: Segment about technology
+    sequence 3, 7 seconds, desc: introducing my self as a developer 
+    sequence 4, 3 seconds, desc: saying hello to the audience
+    sequence 5, 8 seconds, desc: Saying goodbye to the audience
     
     Example Task Request 1:
     Combine segments based on their context to create a cohesive video.
@@ -72,7 +72,7 @@ async function invoke({ editing_request, grouped_segments = [] }) {
   const storyLines = tempSegments
     .map(
       (segment) =>
-        `part ${segment.id}, ${segment.duration}, desc: ${segment.description}.`
+        `sequence ${segment.id}, ${segment.duration}, desc: ${segment.description}.`
     )
     .join("\n\n"); // Double newline for clearer separation
 
