@@ -6,8 +6,12 @@ const fs = require("fs");
 const contextChain = require("../../chains/segment-grouper-chain");
 const { getVideoProjectModels } = require("./service");
 const { createFolder, safeUnlink } = require("../../helpers/file");
-const { getFileInformation } = require("./video-engine.service");
+const {
+  getFileInformation,
+  getAudioFromVideo,
+} = require("./video-engine.service");
 const { processed_videos_dir } = require("./config");
+const { getTranscriptSegmentsByOpenai } = require("./speech-to-text.service");
 
 async function processVideo(fileDoc) {
   const { _id, originalName, fileName, owner, format, tag, size } = fileDoc;
@@ -39,11 +43,11 @@ async function processVideo(fileDoc) {
 
   try {
     // Generate audio from the video
-    const outputFile = await generateAudio(filePath);
+    const outputFile = await getAudioFromVideo({ filePath });
 
     await Promise.all([
       // Get the transcript segments
-      getTranscriptSegments(outputFile)
+      getTranscriptSegmentsByOpenai(outputFile)
         .then((res) => {
           language = res.language;
           return res.segments.map((segment, index) => ({
@@ -52,7 +56,9 @@ async function processVideo(fileDoc) {
           }));
         })
         .then((res) => (segments = res))
-        .finally(() => safeUnlink(outputFile)),
+        .finally(() => {
+          safeUnlink(outputFile);
+        }),
 
       // Generate low quality video
       generateLowQualityVideo(filePath)
@@ -130,33 +136,6 @@ async function generateLowQualityVideo(filePath) {
   });
 }
 
-function generateAudio(filePath) {
-  const _id = path.basename(filePath, path.extname(filePath));
-
-  const outputFile = path.join(processed_videos_dir, `${_id}.mp3`);
-
-  return new Promise(async (resolve, reject) => {
-    await createFolder(processed_videos_dir);
-
-    fluentFfmpeg(filePath)
-      .audioChannels(1)
-      .audioBitrate("96k")
-      .audioCodec("libmp3lame")
-      // .output(outputFile)
-      .on("error", (err) => {
-        console.error(`video convert error: ${err.message}`);
-        reject(err);
-      })
-      .on("progress", (progress) => {
-        // console.log(`Processing video: ${progress.percent}%`);
-      })
-      .on("end", () => {
-        resolve(outputFile);
-      })
-      .saveToFile(outputFile);
-  });
-}
-
 function getFormatProperties(filePath) {
   return new Promise(async (resolve, reject) => {
     fluentFfmpeg.ffprobe(filePath, (err, { format = {} }) => {
@@ -167,36 +146,6 @@ function getFormatProperties(filePath) {
       }
     });
   });
-}
-
-async function getTranscriptSegments(filePath) {
-  const openai = new OpenAI.OpenAI();
-  openai.apiKey = process.env.OPENAI_API_KEY || "";
-
-  const transcription = await openai.audio.transcriptions.create({
-    file: fs.createReadStream(filePath),
-    model: "whisper-1",
-    language: "fa",
-    response_format: "verbose_json",
-    timestamp_granularities: ["segment"],
-    temperature: 0.0,
-    prompt: "if you cant find human voice, just describe the sound",
-  });
-
-  // @ts-ignore
-  const segments = transcription.segments.map(({ start, end, text }) => {
-    return {
-      start,
-      end,
-      text,
-    };
-  });
-
-  return {
-    segments,
-    // @ts-ignore
-    language: transcription.language,
-  };
 }
 
 /**
@@ -245,6 +194,7 @@ async function extractGroupedSegments(segments) {
     ];
   }
 
+  // @ts-ignore
   return groupedSegments;
 }
 

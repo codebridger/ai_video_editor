@@ -1,8 +1,8 @@
 const path = require("path");
 const fs = require("fs");
 const fluentFfmpeg = require("fluent-ffmpeg");
-const { temptDir } = require("./config");
-const { safeUnlink } = require("../../helpers/file");
+const { temptDir, processed_videos_dir } = require("./config");
+const { safeUnlink, createFolder } = require("../../helpers/file");
 
 /**
  * Merges multiple video files into a single video file.
@@ -171,8 +171,36 @@ function getFileInformation(filePath) {
   });
 }
 
+function getAudioFromVideo({ filePath, bitrate = "96k" }) {
+  const _id = path.basename(filePath, path.extname(filePath));
+
+  const outputFile = path.join(processed_videos_dir, `${_id}.mp3`);
+
+  return new Promise(async (resolve, reject) => {
+    await createFolder(processed_videos_dir);
+
+    fluentFfmpeg(filePath)
+      .audioChannels(1)
+      .audioBitrate(bitrate)
+      .audioCodec("libmp3lame")
+      // .output(outputFile)
+      .on("error", (err) => {
+        console.error(`video convert error: ${err.message}`);
+        reject(err);
+      })
+      .on("progress", (progress) => {
+        // console.log(`Processing video: ${progress.percent}%`);
+      })
+      .on("end", () => {
+        resolve(outputFile);
+      })
+      .saveToFile(outputFile);
+  });
+}
+
 module.exports = {
   exportVideoBySegments,
   mergeVideos,
   getFileInformation,
+  getAudioFromVideo,
 };

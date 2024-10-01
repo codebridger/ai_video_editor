@@ -58,6 +58,7 @@ const videoMedia = new CollectionDefinition({
   collection: VIDEO_PROJECT.VIDEO_MEDIA,
   schema: new Schema(
     {
+      lang: { type: String, default: "en" },
       fileId: String,
       lowQualityFileId: String,
       fileName: String,

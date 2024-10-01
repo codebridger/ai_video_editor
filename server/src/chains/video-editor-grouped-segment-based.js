@@ -7,17 +7,13 @@ const prompt = ChatPromptTemplate.fromMessages([
   [
     "system",
     `
-    Break the given text list into context-based groups:
-    - Analyze the content of each segment to determine its context.
-    - Group segments that share similar themes or topics together.
-    - Do not group segments solely based on their numeric order.
-    - Return a list of groups, where each group is a list of segment IDs.
-    - The ID range is from 0 to {total_segments}.
-    - Each group should contain segments that share a common context or theme.
-    - For example, if there are segments about "nature" and "technology", group them accordingly.
-    - Maximum 20-40 segments per group.
-    - Minimum 2 segments per group.
-    - Ensure diverse grouping to reflect different themes.
+    You are a story editor for a video production company.
+    what you have is a sort of script with part numbers, durations, and descriptions of each.
+
+    Instructions:
+    1. check the [Task Request] to understand what kind of video you need to create.
+    2. Combine the segments based on their context to create a cohesive video.
+    3. The output should be a list of part ids in the order they should be combined.
 
     Example Text List:
     part 1, 10 seconds, desc: Segment about nature
@@ -76,10 +72,11 @@ async function invoke({ editing_request, grouped_segments = [] }) {
   const storyLines = tempSegments
     .map(
       (segment) =>
-        `part ${segment.id}, ${segment.duration} seconds, desc:
-  ${segment.description}`
+        `part ${segment.id}, ${segment.duration}, desc: ${segment.description}.`
     )
     .join("\n\n"); // Double newline for clearer separation
+
+  console.log("\n", "STORY LINES", storyLines, "\n");
 
   const partIds = await chain
     .invoke({

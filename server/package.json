@@ -14,6 +14,7 @@
     "dev": "nodemon -q src/index.js"
   },
   "dependencies": {
+    "@google-cloud/speech": "^6.6.1",
     "@langchain/google-genai": "^0.0.21",
     "@modular-rest/server": "/Users/navid-shad/Projects/Personal/modular-rest/packages/server",
     "dotenv": "^16.4.5",

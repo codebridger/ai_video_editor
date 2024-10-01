@@ -22,7 +22,7 @@ export type ProjectType = {
   timelinePreview: {
     fileId: string;
     isPending: boolean;
-  }
+  };
 };
 
 export type SegmentType = {
@@ -42,6 +42,7 @@ export type GroupedSegment = {
 
 export type VideoMediaType = {
   _id: string;
+  lang: string;
   fileId: string;
   lowQualityFileId: string;
   fileName: string;
