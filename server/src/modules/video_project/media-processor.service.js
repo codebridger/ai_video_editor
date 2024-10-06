@@ -58,7 +58,7 @@ async function processVideo(fileDoc) {
         })
         .then((res) => (segments = res))
         .finally(() => {
-          // safeUnlink(outputFile);
+          safeUnlink(outputFile);
         }),
 
       // Generate low quality video
