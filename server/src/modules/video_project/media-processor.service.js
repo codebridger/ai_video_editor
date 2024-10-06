@@ -1,6 +1,6 @@
 const { getFilePath, storeFile, removeFile } = require("@modular-rest/server");
 const fluentFfmpeg = require("fluent-ffmpeg");
-
+const path = require("path");
 const contextChain = require("../../chains/context-chain");
 const { getVideoProjectModels } = require("./service");
 const { createFolder, safeUnlink } = require("../../helpers/file");
@@ -9,7 +9,10 @@ const {
   getAudioFromVideo,
 } = require("./video-engine.service");
 const { processed_videos_dir } = require("./config");
-const { getTranscriptSegmentsByOpenai } = require("./speech-to-text.service");
+const {
+  getTranscriptSegmentsByOpenai,
+  getTranscriptSegmentsByGroq,
+} = require("./speech-to-text.service");
 
 async function processVideo(fileDoc) {
   const { _id, originalName, fileName, owner, format, tag, size } = fileDoc;
@@ -45,7 +48,7 @@ async function processVideo(fileDoc) {
 
     await Promise.all([
       // Get the transcript segments
-      getTranscriptSegmentsByOpenai(outputFile)
+      getTranscriptSegmentsByGroq(outputFile)
         .then((res) => {
           language = res.language;
           return res.segments.map((segment, index) => ({
@@ -55,7 +58,7 @@ async function processVideo(fileDoc) {
         })
         .then((res) => (segments = res))
         .finally(() => {
-          safeUnlink(outputFile);
+          // safeUnlink(outputFile);
         }),
 
       // Generate low quality video

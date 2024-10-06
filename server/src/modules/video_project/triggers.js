@@ -1,9 +1,9 @@
 const {
-  CmsTrigger,
   getCollection,
   DatabaseTrigger,
   removeFile,
-} = require("@modular-rest/server/src");
+} = require("@modular-rest/server");
+
 const projectService = require("./service");
 const mediaProcessor = require("./media-processor.service");
 const { VIDEO_PROJECT } = require("../../config");
@@ -79,7 +79,7 @@ module.exports.projectFileTriggers = [
   When a video file is uploaded, 
   we need to process it to extract the audio and transcript.
  */
-  new CmsTrigger("insert-one", async ({ query, queryResult }) => {
+  new DatabaseTrigger("insert-one", async ({ query, queryResult }) => {
     const { tag } = queryResult;
     const projectDoc = await projectService.findProjectById(tag);
 
@@ -89,7 +89,7 @@ module.exports.projectFileTriggers = [
     }
   }),
 
-  new CmsTrigger("remove-one", async ({ query, queryResult }) => {
+  new DatabaseTrigger("remove-one", async ({ query, queryResult }) => {
     getCollection(VIDEO_PROJECT.DATABASE, VIDEO_PROJECT.VIDEO_MEDIA)
       .deleteOne({ fileId: query._id })
       .exec();

@@ -1,6 +1,7 @@
 const { default: OpenAI } = require("openai");
 const speech = require("@google-cloud/speech");
 const fs = require("fs");
+const Groq = require("groq-sdk");
 
 async function getTranscriptSegmentsByOpenai(filePath) {
   const openai = new OpenAI.OpenAI();
@@ -15,6 +16,33 @@ async function getTranscriptSegmentsByOpenai(filePath) {
     temperature: 0.0,
     prompt: "if you can't find human voice, just describe the sound",
   });
+
+  // @ts-ignore
+  const segments = transcription.segments.map(({ start, end, text }) => {
+    return {
+      start,
+      end,
+      text,
+    };
+  });
+
+  return {
+    segments,
+    // @ts-ignore
+    language: transcription.language,
+  };
+}
+
+async function getTranscriptSegmentsByGroq(filePath) {
+  const groq = new Groq.default.Groq();
+  const transcription = await groq.audio.transcriptions.create({
+    file: fs.createReadStream(filePath),
+    model: "whisper-large-v3",
+    language: "fa",
+    response_format: "verbose_json",
+  });
+
+  console.log(transcription);
 
   // @ts-ignore
   const segments = transcription.segments.map(({ start, end, text }) => {
@@ -68,4 +96,5 @@ async function getTranscriptSegmentsByOpenai(filePath) {
 
 module.exports = {
   getTranscriptSegmentsByOpenai,
+  getTranscriptSegmentsByGroq,
 };
