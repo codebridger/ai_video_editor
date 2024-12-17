@@ -1,11 +1,12 @@
 const { ChatPromptTemplate } = require("@langchain/core/prompts");
+const { JsonOutputParser } = require("@langchain/core/output_parsers");
 
 const { z } = require("zod");
-const { openaiModel, geminiModel } = require("./model");
+const { openAiGptModel, openAio1Model, geminiModel } = require("./model");
 
 const prompt = ChatPromptTemplate.fromMessages([
   [
-    "system",
+    "assistant",
     `
     You are a story editor for a video production company.
     what you have is a sort of script includes sequence-number, durations, and descriptions of each one.
@@ -33,7 +34,11 @@ const prompt = ChatPromptTemplate.fromMessages([
     `,
   ],
   [
-    "human",
+    "assistant",
+    `Return the output in an json array format. For example: [1, 2, 3, 4]`,
+  ],
+  [
+    "user",
     `
     # Text List:
     {grouped_segments}
@@ -52,12 +57,13 @@ function getBaseChain() {
       .describe("List of segment ids."),
   });
 
-  const modelWithStructuredOutput = openaiModel.withStructuredOutput(
+  const modelWithStructuredOutput = openAiGptModel.withStructuredOutput(
     segmentIdsSchema,
     { includeRaw: true }
   );
 
-  return prompt.pipe(modelWithStructuredOutput);
+  const parser = new JsonOutputParser();
+  return prompt.pipe(openAio1Model).pipe(parser);
 }
 
 async function invoke({ editing_request, grouped_segments = [] }) {
@@ -84,15 +90,19 @@ async function invoke({ editing_request, grouped_segments = [] }) {
       grouped_segments: storyLines,
       total_segments: tempSegments.length - 1,
     })
-    .then(({ raw, parsed }) => {
-      if (!parsed) {
-        console.log(
-          "Raw Output on video-editor-grouped-segment-based",
-          raw.content
-        );
-      }
+    .then((parsed) => {
+      // if (!parsed) {
+      //   console.log(
+      //     "Raw Output on video-editor-grouped-segment-based",
+      //     raw.content
+      //   );
+      // }
 
-      return parsed?.partIds || [];
+      return parsed || [];
+    })
+    .catch((error) => {
+      console.error("Error on video-editor-grouped-segment-based", error);
+      return [];
     });
 
   console.log("partIds", partIds);

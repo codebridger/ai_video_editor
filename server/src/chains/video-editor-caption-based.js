@@ -1,7 +1,7 @@
 const { ChatPromptTemplate } = require("@langchain/core/prompts");
 
 const { z } = require("zod");
-const { openaiModel } = require("./model");
+const { openAiGptModel } = require("./model");
 
 function getBaseChain() {
   const segmentIdsSchema = z.object({
@@ -10,7 +10,7 @@ function getBaseChain() {
       .describe("List of segment ids."),
   });
 
-  const modelWithStructuredOutput = openaiModel.withStructuredOutput(
+  const modelWithStructuredOutput = openAiGptModel.withStructuredOutput(
     segmentIdsSchema,
     { includeRaw: true }
   );

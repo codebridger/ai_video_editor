@@ -1,7 +1,8 @@
 const { ChatPromptTemplate } = require("@langchain/core/prompts");
+const { JsonOutputParser } = require("@langchain/core/output_parsers");
 
 const { z } = require("zod");
-const { openaiModel, geminiModel } = require("./model");
+const { openAiGptModel, openAio1Model, geminiModel } = require("./model");
 
 /**
  * Extracts groups of segments based on their contextual relevance.
@@ -22,11 +23,11 @@ function extractGroupsBySegments({ caption_segments }) {
   });
 
   const modelWithStructuredOutput =
-    openaiModel.withStructuredOutput(segmentIdsSchema);
+    openAiGptModel.withStructuredOutput(segmentIdsSchema);
 
   const prompt = ChatPromptTemplate.fromMessages([
     [
-      "system",
+      "assistant",
       `
       Break the given text list into contextually relevant groups:
       - Analyze the context of each segment to determine its grouping.
@@ -40,7 +41,24 @@ function extractGroupsBySegments({ caption_segments }) {
       `,
     ],
     [
-      "human",
+      "assistant",
+      `return a json object with the following structure:
+      {{
+        "groups": [
+          {{
+            "ids": [0, 1, 2, 3],
+            "description": "Description of the group"
+          }},
+          {{
+            "ids": [4, 5, 6],
+            "description": "Description of the group"
+          }}
+        ]
+      }}
+      `,
+    ],
+    [
+      "user",
       `
       Texts to group:
       {caption_segments}
@@ -48,7 +66,9 @@ function extractGroupsBySegments({ caption_segments }) {
     ],
   ]);
 
-  const chain = prompt.pipe(modelWithStructuredOutput);
+  const parser = new JsonOutputParser();
+
+  const chain = prompt.pipe(openAio1Model).pipe(parser);
 
   return chain
     .invoke({
@@ -57,15 +77,18 @@ function extractGroupsBySegments({ caption_segments }) {
       ),
       total_segments: caption_segments.length,
     })
-    .then((parsed) => {
-      return parsed.groups;
+    .then((result) => {
+      // const parsed = JSON.parse(result.content.toString());
+      // const structured = segmentIdsSchema.parse(parsed);
+      // return structured.groups;
+      return result.groups;
     });
 }
 
 function extractGroupDescription(lines = []) {
   const prompt = ChatPromptTemplate.fromMessages([
     [
-      "system",
+      "assistant",
       `
         Take [lines] and generate a ready to use short description for the following text list.
 
@@ -77,7 +100,7 @@ function extractGroupDescription(lines = []) {
       `,
     ],
     [
-      "human",
+      "user",
       `
       [Lines]
       {lines}
@@ -85,7 +108,7 @@ function extractGroupDescription(lines = []) {
     ],
   ]);
 
-  const chain = prompt.pipe(openaiModel);
+  const chain = prompt.pipe(openAio1Model);
 
   return chain
     .invoke({ lines: lines.map((line, i) => `${i + 1}. ${line}`).join("\n") })
