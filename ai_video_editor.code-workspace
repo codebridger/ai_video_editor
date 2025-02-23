@@ -1,8 +1,30 @@
 {
-	"folders": [
-		{
-			"path": "."
-		}
-	],
-	"settings": {}
+  "folders": [
+    // {
+    //   "path": "terminal-app"
+    // },
+    {
+      "path": "client_browser/app",
+      "name": "Client Browser App Layer"
+    },
+    {
+      "path": "client_browser/layers/video-project",
+      "name": "Video Project Layer"
+    },
+    {
+      "path": "client_browser/layers/modular-rest",
+      "name": "Modular Rest Layer"
+    },
+    {
+      "path": "server"
+    },
+    {
+      "path": "client_browser",
+      "name": "Client Browser"
+    },
+    {
+      "path": "."
+    }
+  ],
+  "settings": {}
 }

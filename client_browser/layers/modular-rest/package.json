@@ -1,0 +1,17 @@
+{
+  "name": "modular-rest",
+  "type": "module",
+  "version": "0.0.1",
+  "main": "./nuxt.config.ts",
+  "private": true,
+  "scripts": {},
+  "dependencies": {
+    "@modular-rest/client": "/Users/navid-shad/Projects/Personal/modular-rest/packages/client",
+    "nuxt": "3.11.2"
+  },
+  "devDependencies": {
+    "@nuxt/eslint-config": "^0.1.1",
+    "eslint": "^8.28.0",
+    "typescript": "^4.9.3"
+  }
+}

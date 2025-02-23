@@ -1,0 +1,7 @@
+.env
+node_modules
+.DS_Store
+keys
+uploads
+temp
+google-credentials.json
