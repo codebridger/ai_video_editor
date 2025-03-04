@@ -8,6 +8,7 @@ const router = useRouter();
 
 onMounted(() => {
   const token = (route.query["token"] as string) || null;
+
   handleToken(token);
 });
 

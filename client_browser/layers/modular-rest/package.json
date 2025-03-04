@@ -6,7 +6,7 @@
   "private": true,
   "scripts": {},
   "dependencies": {
-    "@modular-rest/client": "/Users/navid-shad/Projects/Personal/modular-rest/packages/client",
+    "@modular-rest/client": "^1.10.0",
     "nuxt": "3.11.2"
   },
   "devDependencies": {

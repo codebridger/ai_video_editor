@@ -22,7 +22,7 @@ function getProfileInfo() {
 
 export function loginWithLastSession(token?: string) {
   return authentication
-    .loginWithLastSession(token)
+    .loginWithToken(token || "", true)
     .then((user) => {
       isLogin.value = true;
       authUser.value = user;
