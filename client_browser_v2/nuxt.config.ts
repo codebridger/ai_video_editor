@@ -15,7 +15,7 @@ export default defineNuxtConfig({
 
   vite: {
     ssr: {
-      noExternal: ['@tiny-ideas-ir/lib-vue-components'],
+      noExternal: ['@codebridger/lib-vue-components'],
     },
   },
 
@@ -45,7 +45,7 @@ export default defineNuxtConfig({
     },
   },
 
-  css: ['~/assets/css/app.css', '@tiny-ideas-ir/lib-vue-components/style.css'],
+  css: ['~/assets/css/app.css', '@codebridger/lib-vue-components/style.css'],
 
   postcss: {
     plugins: {

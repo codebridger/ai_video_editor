@@ -290,6 +290,23 @@
   dependencies:
     mime "^3.0.0"
 
+"@codebridger/lib-vue-components@^1.17.0-dev.12":
+  version "1.17.0-dev.12"
+  resolved "https://npm.pkg.github.com/download/@codebridger/lib-vue-components/1.17.0-dev.12/f37d1b62150f5b6a5d5e603c445933bbf9feab95#f37d1b62150f5b6a5d5e603c445933bbf9feab95"
+  integrity sha512-94sms2ykgqFmVor5p9ZHn55hXeXi0mS4uL8CI4fHzOqJNTWsXX73GmA7EZYe/6ZpirUhD/2XVAav3wOKsy8OGQ==
+  dependencies:
+    "@headlessui/vue" "^1.7.23"
+    "@storybook/builder-vite" "^8.4.5"
+    "@vueuse/head" "^0.9.7"
+    pinia "^2.0.22"
+    quill "^2.0.2"
+    sweetalert2 "^11.15.3"
+    vue "^3.5.12"
+    vue-collapsed "^1.3.4"
+    vue-router "^4.4.5"
+    vue3-perfect-scrollbar "^1.6.0"
+    vue3-popper "^1.5.0"
+
 "@esbuild/aix-ppc64@0.20.2":
   version "0.20.2"
   resolved "https://registry.yarnpkg.com/@esbuild/aix-ppc64/-/aix-ppc64-0.20.2.tgz#a70f4ac11c6a1dfc18b8bbb13284155d933b9537"
@@ -1415,23 +1432,6 @@
   integrity sha512-+XaB92VXHggiMTP9b0ZoTEvKl2YhxfWaF2BW9xYYt2N4e+gyvz0Phmjdz7oVSbKCDdI0oKSUp/z+KzJ6JZYjCg==
   dependencies:
     "@tanstack/virtual-core" "3.12.0"
-
-"@tiny-ideas-ir/lib-vue-components@^1.14.0":
-  version "1.14.0"
-  resolved "https://npm.pkg.github.com/download/@tiny-ideas-ir/lib-vue-components/1.14.0/18d2ae75275e4ed90593b0f73bcd926bb4074341#18d2ae75275e4ed90593b0f73bcd926bb4074341"
-  integrity sha512-S6zPo+ruQNJMFsaZZqQ/+BQEOdoMO9sph3BbciRZJmJo5TGy370MFMZ+oTTVxSdWAk3aviOJquvChVTMkVlyXw==
-  dependencies:
-    "@headlessui/vue" "^1.7.23"
-    "@storybook/builder-vite" "^8.4.5"
-    "@vueuse/head" "^0.9.7"
-    pinia "^2.0.22"
-    quill "^2.0.2"
-    sweetalert2 "^11.15.3"
-    vue "^3.5.12"
-    vue-collapsed "^1.3.4"
-    vue-router "^4.4.5"
-    vue3-perfect-scrollbar "^1.6.0"
-    vue3-popper "^1.5.0"
 
 "@trysound/sax@0.2.0":
   version "0.2.0"

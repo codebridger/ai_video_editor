@@ -1,4 +1,4 @@
-import type { SidebarGroupType } from '@tiny-ideas-ir/lib-vue-components/types.ts';
+import type { SidebarGroupType } from '@codebridger/lib-vue-components/types.ts';
 
 export const useDashboardNavigatorItems = (): Array<SidebarGroupType> => {
   const { t } = useI18n();

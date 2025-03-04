@@ -8,10 +8,11 @@ module.exports.openaiModel = new ChatOpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-module.exports.geminiModel = new ChatGoogleGenerativeAI({
-  model: "gemini-1.5-pro",
-  // maxOutputTokens: 2048,
-  temperature: 1,
-  // @ts-ignore
-  apiKey: process.env.GOOGLE_API_KEY,
-});
+module.exports.geminiModel = null;
+// new ChatGoogleGenerativeAI({
+//   model: "gemini-1.5-pro",
+//   // maxOutputTokens: 2048,
+//   temperature: 1,
+//   // @ts-ignore
+//   apiKey: process.env.GOOGLE_API_KEY,
+// });

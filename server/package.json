@@ -16,7 +16,7 @@
   "dependencies": {
     "@google-cloud/speech": "^6.6.1",
     "@langchain/google-genai": "^0.0.21",
-    "@modular-rest/server": "/Users/navid-shad/Projects/Personal/modular-rest/packages/server",
+    "@modular-rest/server": "^1.11.11",
     "dotenv": "^16.4.5",
     "fluent-ffmpeg": "^2.1.3",
     "googleapis": "^140.0.0",
