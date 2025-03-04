@@ -44,7 +44,7 @@
         <p class="text-base font-bold leading-normal text-white-dark">Use one of your social accounts to sing-in / sign-up.</p>
       </div>
       <form class="space-y-5 dark:text-white" @submit.prevent="router.push('/')">
-        <Button disabled color="gradient" shadow uppercase block iconName="IconInstagram" :label="t('auth.signin_with_instagram')" />
+        <!-- <Button disabled color="gradient" shadow uppercase block iconName="IconInstagram" :label="t('auth.signin_with_instagram')" /> -->
         <Button @click="triggerGoogleLoginProcess" color="gradient" shadow uppercase block iconName="IconGoogle" :label="t('auth.signin_with_google')" />
       </form>
       <div class="relative my-7 text-center md:mb-9">
