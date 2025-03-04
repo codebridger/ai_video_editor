@@ -30,7 +30,7 @@ const app = createRest({
   port: 8080,
   modulesPath: path.join(__dirname, "modules"),
   uploadDirectory: path.join(__dirname, "..", "uploads"),
-  keypair: process.env.KEYPAIR ? getKeys() : undefined,
+  // keypair: process.env.KEYPAIR ? getKeys() : undefined,
   staticPath: {
     rootDir: path.join(__dirname, "..", "uploads"),
     rootPath: "/assets",

@@ -1,5 +1,5 @@
 import { type FileDocument } from '@modular-rest/client/dist/types/types';
-import { USER_CONTENT, VIDEO_PROJECT } from '../../server/src/config';
+import { USER_CONTENT, VIDEO_PROJECT } from '~/config';
 
 export const DATABASE = {
   USER_CONTENT: USER_CONTENT.DATABASE,
