@@ -1,39 +1,32 @@
 <template>
-  <App>
-    <DashboardShell brand-title="ChatPilots">
-      <template #header>
-        <div class="flex w-full justify-end">
-          <PartialProfileButton />
-        </div>
-      </template>
+    <App>
+        <DashboardShell brand-title="ChatPilots" menu-style="horizontal">
+            <template #header>
+                <div class="flex w-full justify-end space-x-2">
+                    <PartialThemeSwitcher />
+                    <PartialProfileButton />
+                </div>
+            </template>
 
-      <template #horizontal-menu>
-        <HorizontalMenu :items="[]" />
-      </template>
+            <template #horizontal-menu>
+                <HorizontalMenu title="ChatPilots" :items="[]" />
+            </template>
 
-      <template #sidebar-menu>
-        <SidebarMenu title="ChatPilots" :items="menuItems" @item-click="onMenuItemClicked" />
-      </template>
+            <template #content>
+                <NuxtPage />
+            </template>
+        </DashboardShell>
 
-      <template #content>
-        <NuxtPage />
-      </template>
-    </DashboardShell>
-
-    <ThemeCustomizer />
-  </App>
+        <ThemeCustomizer />
+    </App>
 </template>
 
 <script setup lang="ts">
-  import { App, DashboardShell, ThemeCustomizer, SidebarMenu, HorizontalMenu } from '@codebridger/lib-vue-components/shell.ts';
-  import type { SidebarItemType, HorizontalMenuItemType } from '@codebridger/lib-vue-components/types.ts';
-
-  const menuItems = useDashboardNavigatorItems();
-  const router = useRouter();
-
-  function onMenuItemClicked(item: SidebarItemType | HorizontalMenuItemType) {
-    if (item?.to) {
-      router.push(item.to);
-    }
-  }
+    import { App, DashboardShell, ThemeCustomizer, HorizontalMenu } from '@codebridger/lib-vue-components/shell.ts';
 </script>
+
+<style scoped>
+    .horizontal-menu {
+        display: none !important;
+    }
+</style>
