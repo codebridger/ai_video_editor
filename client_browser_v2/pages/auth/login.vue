@@ -61,7 +61,7 @@
             </div>
             <div class="text-center dark:text-white">
                 {{ t('auth.do-not-have-account') }}
-                <span class="text-primary"> {{ t('sign-in-new-account') }} </span>
+                <span class="text-primary"> {{ t('auth.sign-in-new-account') }} </span>
             </div>
         </div>
     </div>

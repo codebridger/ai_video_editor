@@ -16,5 +16,10 @@
         "title": "Video Project",
         "shorts": "Shorts",
         "timeline": "Timeline"
-    }
+    },
+    "or": "or",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit"
 }
