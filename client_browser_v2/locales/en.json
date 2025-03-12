@@ -1,3 +1,13 @@
 {
-    "dashboard": "Dashboard"
+    "dashboard": "Dashboard",
+    "statistic": "Statistic",
+    "auth": {
+        "sign-in": "Sign In",
+        "sign-out": "Sign Out",
+        "choose-account-type": "Use one of your social accounts to sing-in / sign-up.",
+        "sign-in-with-google": "SIGN IN WITH GOOGLE",
+        "sign-in-with-instagram": "SIGN IN WITH INSTAGRAM",
+        "do-not-have-account": "Don't have an account? ",
+        "sign-in-new-account": "Just sign-in you will get a new account."
+    }
 }
