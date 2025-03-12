@@ -1,6 +1,6 @@
 <template>
     <App>
-        <DashboardShell brand-title="ChatPilots" menu-style="horizontal">
+        <DashboardShell :brand-title="t('ai-video-editor')" menu-style="horizontal">
             <template #header>
                 <div class="flex w-full justify-end space-x-2">
                     <PartialThemeSwitcher />
@@ -9,7 +9,7 @@
             </template>
 
             <template #horizontal-menu>
-                <HorizontalMenu title="ChatPilots" :items="[]" />
+                <HorizontalMenu :title="t('ai-video-editor')" :items="[]" />
             </template>
 
             <template #content>
@@ -23,6 +23,7 @@
 
 <script setup lang="ts">
     import { App, DashboardShell, ThemeCustomizer, HorizontalMenu } from '@codebridger/lib-vue-components/shell.ts';
+    const { t } = useI18n();
 </script>
 
 <style scoped>

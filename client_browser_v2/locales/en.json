@@ -1,6 +1,7 @@
 {
     "dashboard": "Dashboard",
     "statistic": "Statistic",
+    "ai-video-editor": "AI Video Editor",
     "auth": {
         "sign-in": "Sign In",
         "sign-out": "Sign Out",
@@ -10,5 +11,10 @@
         "do-not-have-account": "Don't have an account? ",
         "sign-in-new-account": "Just sign-in you will get a new account.",
         "login-boxed": "Login Boxed"
+    },
+    "video-project": {
+        "title": "Video Project",
+        "shorts": "Shorts",
+        "timeline": "Timeline"
     }
 }
