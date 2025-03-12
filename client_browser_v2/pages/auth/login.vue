@@ -74,7 +74,7 @@
 
     const { t } = useI18n();
 
-    useHead({ title: t('auth.login_boxed') });
+    useHead({ title: t('auth.login-boxed') });
 
     const router = useRouter();
 
