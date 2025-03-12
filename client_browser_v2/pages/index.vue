@@ -1,14 +1,15 @@
 <template>
-  <div>
-    <h1>starter page</h1>
-  </div>
+    <div>
+        <h1>starter page</h1>
+    </div>
 </template>
 
 <script setup lang="ts">
-  definePageMeta({
-    layout: 'default',
-    title: 'Starter Page',
-    // @ts-ignore
-    middleware: ['auth'],
-  });
+    const { t } = useI18n();
+    definePageMeta({
+        layout: 'default',
+        title: () => t('dashboard'),
+        // @ts-ignore
+        middleware: ['auth'],
+    });
 </script>
