@@ -1,16 +1,13 @@
 <template>
-    <section class="flex items-end justify-between space-x-4">
+    <section class="flex w-full items-end justify-between space-x-4">
         <div class="flex-1">
-            <Textarea
+            <TextArea
                 type="text"
                 :label="props.title"
                 :placeholder="t('type-here')"
                 v-model="props.modelValue"
-                :error="!!error"
-                :error-message="error || ''"
-                :loading="!!props.newPhrase && isSubmitting"
                 @update:model-value="emit('update:modelValue', $event)"
-                class="mb-2 min-h-24 w-full p-2"
+                class="mb-2 min-h-24 w-full"
             />
             <Button @click="emit('generate', props.modelValue)" :loading="loading" :label="t('video-project.generate-timeline')" />
         </div>
