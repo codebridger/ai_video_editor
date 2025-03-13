@@ -1,6 +1,11 @@
 <template>
-    <section class="w-full p-6">
-        <WidgetsPromptBox title="Prompt to generate video" v-model="prompt" :loading="isGeneratingTimeline" @generate="generateTimeline" />
+    <section class="flex w-full space-x-8 p-6">
+        <div class="w-2/5">
+            <VideoProjectSidebar />
+        </div>
+        <div class="w-3/5">
+            <WidgetsPromptBox title="Prompt to generate video" v-model="prompt" :loading="isGeneratingTimeline" @generate="generateTimeline" />
+        </div>
     </section>
 </template>
 
