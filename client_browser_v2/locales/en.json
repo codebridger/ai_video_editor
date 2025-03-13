@@ -2,6 +2,7 @@
     "dashboard": "Dashboard",
     "statistic": "Statistic",
     "ai-video-editor": "AI Video Editor",
+    "description": "Description",
     "auth": {
         "sign-in": "Sign In",
         "sign-out": "Sign Out",
