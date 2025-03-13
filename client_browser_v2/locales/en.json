@@ -3,6 +3,7 @@
     "statistic": "Statistic",
     "ai-video-editor": "AI Video Editor",
     "description": "Description",
+    "type-here": "Type here...",
     "auth": {
         "sign-in": "Sign In",
         "sign-out": "Sign Out",
@@ -20,7 +21,8 @@
         "your-projects": "Your Projects",
         "add-project": "Add Project",
         "project-name": "Project Name",
-        "add-project-error": "Add Project Was Unsuccessful"
+        "add-project-error": "Add Project Was Unsuccessful",
+        "generate-timeline": "Generate Timeline"
     },
     "or": "or",
     "cancel": "Cancel",
