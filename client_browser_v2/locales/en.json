@@ -2,6 +2,7 @@
     "dashboard": "Dashboard",
     "statistic": "Statistic",
     "ai-video-editor": "AI Video Editor",
+    "description": "Description",
     "auth": {
         "sign-in": "Sign In",
         "sign-out": "Sign Out",
@@ -15,10 +16,15 @@
     "video-project": {
         "title": "Video Project",
         "shorts": "Shorts",
-        "timeline": "Timeline"
+        "timeline": "Timeline",
+        "your-projects": "Your Projects",
+        "add-project": "Add Project",
+        "project-name": "Project Name",
+        "add-project-error": "Add Project Was Unsuccessful"
     },
     "or": "or",
     "cancel": "Cancel",
+    "create": "Create",
     "save": "Save",
     "delete": "Delete",
     "edit": "Edit"
