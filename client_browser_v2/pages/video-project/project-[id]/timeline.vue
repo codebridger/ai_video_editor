@@ -1,15 +1,12 @@
 <template>
-    <div>
-        <h1>starter page</h1>
-    </div>
+    <h1>{{ t('video-project.timeline') }}</h1>
 </template>
 
 <script setup lang="ts">
     const { t } = useI18n();
     definePageMeta({
-        layout: 'default',
-        title: () => t('dashboard'),
-        // @ts-ignore
+        layout: 'project',
+        title: () => t('video-project.timeline'),
         middleware: ['auth'],
     });
 </script>
