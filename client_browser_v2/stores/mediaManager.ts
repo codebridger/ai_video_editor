@@ -1,4 +1,4 @@
-import { fileProvider, Types, functionProvider, dataProvider } from '@modular-rest/client';
+import { authentication, fileProvider, Types, functionProvider, dataProvider } from '@modular-rest/client';
 
 import { defineStore } from 'pinia';
 
@@ -15,7 +15,7 @@ import { sleep } from '../helpers/promise';
 import { ref } from 'vue';
 
 export const useMediaManagerStore = defineStore('mediaManagerStore', () => {
-    const authUser = ref<{ id: string } | null>(null);
+    const authUser = computed(() => authentication.user);
     const projectId = ref<string>('');
 
     // The uploaded files for the project, Native cms files

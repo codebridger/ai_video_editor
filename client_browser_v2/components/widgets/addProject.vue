@@ -5,7 +5,7 @@
         </template>
         <template #default>
             <div class="flex flex-col space-y-2 p-4">
-                <Input :placeholder="t('video-project.project-name')" v-model="title" :error="!!error" :error-message="error || ''" />
+                <Input :placeholder="t('video-project.project-name')" v-model="title" />
             </div>
         </template>
 
