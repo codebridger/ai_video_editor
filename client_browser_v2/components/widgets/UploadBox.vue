@@ -1,6 +1,6 @@
 <template>
     <div>
-        <FullscreenDropfile icon="IconGallery" :filter-file-dropped="(file) => file.type.startsWith('image')" @drop="addUploadList" />
+        <FullscreenDropfile icon="IconGallery" :filter-file-dropped="(file: File) => file.type.startsWith('image')" @drop="addUploadList" />
 
         <InputFileHeadless v-slot="{ open, remove, drop, files }" :update:modelValue="addUploadList" multiple>
             <!-- Controls -->
