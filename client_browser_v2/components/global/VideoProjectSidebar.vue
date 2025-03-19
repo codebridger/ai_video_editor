@@ -1,6 +1,6 @@
 <template>
     <section class="w-full">
-        <Tabs :tabs="tabs" v-model="activeTab" containerClass="mb-5 border rounded p-2 h-screen">
+        <Tabs :tabs="tabs" v-model="activeTab" containerClass="mb-5 border rounded p-2 min-h-max">
             <!-- Custom icons for tabs -->
             <template #icon-uploadMedia>
                 <Icon name="IconFolderMinus" />
@@ -13,6 +13,7 @@
             <template #content-uploadMedia>
                 <div>
                     <p>Upload Media</p>
+                    <WidgetsUploadedMediaList />
                 </div>
             </template>
 
@@ -39,13 +40,11 @@
             id: 'uploadMedia',
             label: 'Upload Media',
             value: 'uploadMedia',
-            icon: 'mdi-light:cloud-upload',
         },
         {
             id: 'processedMedia',
             label: 'Processed Media',
             value: 'processedMedia',
-            icon: 'mdi-light:filmstrip',
         },
     ];
 </script>
