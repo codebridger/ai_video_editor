@@ -1,7 +1,7 @@
 <template>
     <section
         :class="[
-            'dark:border-muted-700 border-y-[1px] border-solid border-y-gray-200',
+            'border-y-[1px] border-solid border-y-gray-200 dark:border-gray-700',
             'flex flex-wrap content-start justify-center',
             'h-full w-full overflow-hidden overflow-y-auto',
         ]"
