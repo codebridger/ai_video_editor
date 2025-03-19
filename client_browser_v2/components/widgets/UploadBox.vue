@@ -1,11 +1,12 @@
 <template>
     <section>
-        <h1>UploadBox</h1>
+        <DropFile accept="video/*" multiple v-model="addUploadList" @drop="addUploadList" />
     </section>
 </template>
 
 <script setup lang="ts">
     import { useMediaManagerStore } from '../../stores/mediaManager.ts';
+    import { DropFile } from '@codebridger/lib-vue-components/elements.ts';
 
     const mediaManagerStore = useMediaManagerStore();
 
