@@ -22,12 +22,17 @@
         "add-project": "Add Project",
         "project-name": "Project Name",
         "add-project-error": "Add Project Was Unsuccessful",
-        "generate-timeline": "Generate Timeline"
+        "generate-timeline": "Generate Timeline",
+        "remove-file": "Remove File",
+        "are-you-sure-you-want-to-remove-this-file": "Are you sure you want to remove this file?"
     },
     "or": "or",
     "cancel": "Cancel",
     "create": "Create",
     "save": "Save",
     "delete": "Delete",
-    "edit": "Edit"
+    "edit": "Edit",
+    "decline": "Decline",
+    "accept": "Accept",
+    "close": "Close"
 }
