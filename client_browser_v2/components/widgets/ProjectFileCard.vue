@@ -7,7 +7,7 @@
                 'relative',
                 'm-1 flex h-32 w-32 flex-col justify-center p-2',
                 'word-wrap break-all',
-                'dark:text-muted-400 text-gray-400',
+                'text-gray-400 dark:text-gray-400',
                 // Hoverable
                 'hover:bg-primary-200 dark:hover:bg-primary-700',
                 'hover:cursor-pointer',
