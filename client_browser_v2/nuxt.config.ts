@@ -74,6 +74,6 @@ export default defineNuxtConfig({
 
     // Make sure your build options are properly set
     build: {
-        transpile: ['@tiny-ideas-lr/lib-vue-components'],
+        transpile: ['@codebridger/lib-vue-components'],
     },
 });
