@@ -1,7 +1,5 @@
 <template>
     <div>
-        <InputDragFile icon="IconGallery" :filter-file-dropped="(file: File) => file.type.startsWith('image')" @drop="addUploadList" />
-
         <InputFileHeadless v-slot="{ open, remove, drop, files }" :update:modelValue="addUploadList" multiple>
             <!-- Controls -->
             <div class="mb-4 flex items-center gap-2">
@@ -52,12 +50,14 @@
                 </ul>
             </div>
         </InputFileHeadless>
+
+        <InputFileDropMode icon="IconGallery" :filter-file-dropped="(file: File) => file.type.startsWith('image')" @drop="addUploadList" />
     </div>
 </template>
 
 <script setup lang="ts">
     import { useMediaManagerStore } from '../../stores/mediaManager.ts';
-    import { IconButton, InputDragFile, InputFileHeadless, Icon } from '@codebridger/lib-vue-components/elements.ts';
+    import { IconButton, InputFileDropMode, InputFileHeadless, Icon } from '@codebridger/lib-vue-components/elements.ts';
 
     const mediaManagerStore = useMediaManagerStore();
 
