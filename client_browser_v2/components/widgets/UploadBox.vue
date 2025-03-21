@@ -1,11 +1,11 @@
 <template>
     <div>
-        <InputFileHeadless v-slot="{ open, remove, drop, files }" :update:modelValue="addUploadList" multiple>
+        <InputFileHeadless v-slot="{ open, remove, drop, files }" v-model="uploadedFiles" multiple>
             <!-- Controls -->
             <div class="mb-4 flex items-center gap-2">
                 <IconButton size="sm" title="Select files" @click="open" icon="IconPlus" label="Select files" />
 
-                <IconButton size="sm" title="Start Upload" icon="IconArrowUp" label="Start Upload" @click="startUpload" />
+                <IconButton size="sm" title="Start Upload" icon="IconArrowUp" label="Start Upload" disabled />
             </div>
 
             <div
@@ -18,7 +18,7 @@
                 @drop="drop"
             >
                 <div
-                    v-if="!files?.length"
+                    v-if="!mediaManagerStore.uploadList.length"
                     class="focus:ring-primary-500/50 group cursor-pointer rounded-lg border-[3px] border-dashed border-gray-300 p-8 transition-colors duration-300 hover:border-gray-400 focus:border-gray-400 focus:outline-none focus:ring-2 dark:border-gray-700 dark:hover:border-gray-600 dark:focus:border-gray-700"
                     tabindex="0"
                     role="button"
@@ -51,19 +51,22 @@
             </div>
         </InputFileHeadless>
 
-        <InputFileDropMode icon="IconGallery" :filter-file-dropped="(file: File) => file.type.startsWith('image')" @drop="addUploadList" />
+        <InputFileDropMode icon="IconGallery" :filter-file-dropped="(file: File) => file.type.startsWith('image')" @drop="handleFileDrop" />
     </div>
 </template>
 
 <script setup lang="ts">
     import { useMediaManagerStore } from '../../stores/mediaManager.ts';
     import { IconButton, InputFileDropMode, InputFileHeadless, Icon } from '@codebridger/lib-vue-components/elements.ts';
+    import { ref, watch } from 'vue';
 
     const mediaManagerStore = useMediaManagerStore();
+    const uploadedFiles = ref<FileList | null>(null);
 
-    const startUpload = () => {
-        console.log('startUpload');
-    };
+    // Watch for changes to uploadedFiles and update the store
+    watch(uploadedFiles, (files) => {
+        addUploadList(files);
+    });
 
     function addUploadList(files: FileList | null) {
         if (!files) {
@@ -77,5 +80,9 @@
 
             mediaManagerStore.uploadList.push(file);
         });
+    }
+
+    function handleFileDrop(fileList: FileList) {
+        addUploadList(fileList);
     }
 </script>
