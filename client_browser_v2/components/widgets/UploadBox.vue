@@ -1,6 +1,6 @@
 <template>
     <div>
-        <FullscreenDropfile icon="IconGallery" :filter-file-dropped="(file: File) => file.type.startsWith('image')" @drop="addUploadList" />
+        <InputDragFile icon="IconGallery" :filter-file-dropped="(file: File) => file.type.startsWith('image')" @drop="addUploadList" />
 
         <InputFileHeadless v-slot="{ open, remove, drop, files }" :update:modelValue="addUploadList" multiple>
             <!-- Controls -->
@@ -27,7 +27,7 @@
                     @click="open"
                     @keydown.enter.prevent="open"
                 >
-                    <div class="p-5 text-center">
+                    <div class="flex flex-col items-center justify-center gap-2 p-2">
                         <Icon name="IconCloudUpload" class="size-10 text-gray-400" />
 
                         <h4 class="font-sans text-sm text-gray-400">Drop files to upload</h4>
@@ -45,7 +45,7 @@
                     </div>
                 </div>
 
-                <ul v-else class="mt-6 space-y-2 overflow-auto">
+                <ul v-if="mediaManagerStore.uploadList.length" class="mt-6 space-y-2 overflow-auto">
                     <li v-for="file in mediaManagerStore.uploadList" :key="file.name" :tooltip="file.name">
                         <WidgetsUploadingFileCard :file="file" @remove="remove(file)" />
                     </li>
@@ -57,7 +57,7 @@
 
 <script setup lang="ts">
     import { useMediaManagerStore } from '../../stores/mediaManager.ts';
-    import { IconButton, FullscreenDropfile, InputFileHeadless, Icon } from '@codebridger/lib-vue-components/elements.ts';
+    import { IconButton, InputDragFile, InputFileHeadless, Icon } from '@codebridger/lib-vue-components/elements.ts';
 
     const mediaManagerStore = useMediaManagerStore();
 
