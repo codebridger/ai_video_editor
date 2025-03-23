@@ -1,12 +1,12 @@
 <template>
     <section
         :class="[
-            'border-y-[1px] border-solid border-y-gray-200 dark:border-gray-700',
-            'flex flex-wrap content-start justify-center',
+            'border-x-[1px] border-b-[1px] border-solid border-gray-200 dark:border-gray-700',
+            'flex flex-wrap items-start justify-start',
             'h-full w-full overflow-hidden overflow-y-auto',
+            'p-2',
         ]"
     >
-        <h1>Uploaded Media List</h1>
         <template v-for="file in mediaManagerStore.projectFiles" :key="file._id">
             <WidgetsProjectFileCard :file="file" @remove="mediaManagerStore.removeProjectFile" :confirm-remove="true" />
         </template>
