@@ -1,6 +1,6 @@
 <template>
     <section class="w-full">
-        <Tabs :tabs="tabs" v-model="activeTab" containerClass="mb-5 border rounded p-2 min-h-max">
+        <Tabs :tabs="tabs" v-model="activeTab" containerClass="min-h-max">
             <!-- Custom icons for tabs -->
             <template #icon-uploadMedia>
                 <Icon name="IconFolderMinus" />
@@ -11,15 +11,15 @@
 
             <!-- Custom content for each tab -->
             <template #content-uploadMedia>
-                <div>
-                    <p>Upload Media</p>
+                <div class="flex flex-col gap-4">
                     <WidgetsUploadedMediaList />
+                    <WidgetsUploadBox />
                 </div>
             </template>
 
             <template #content-processedMedia>
                 <div>
-                    <p>Processed Media</p>
+                    <WidgetsProcessedMediaList />
                 </div>
             </template>
         </Tabs>
