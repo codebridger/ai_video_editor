@@ -5,7 +5,7 @@
                 type="text"
                 :label="props.title"
                 :placeholder="t('type-here')"
-                v-model="props.modelValue"
+                :model-value="props.modelValue"
                 @update:model-value="emit('update:modelValue', $event)"
                 class="mb-2 min-h-24 w-full"
             />
