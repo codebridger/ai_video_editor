@@ -1,12 +1,12 @@
 <template>
     <div>
-        <InputFileDragMode autoUpload accept="video/*" @file-select="addUploadList" />
+        <FileInputCombo autoUpload accept="video/*" @file-select="addUploadList" />
     </div>
 </template>
 
 <script setup lang="ts">
     import { useMediaManagerStore } from '../../stores/mediaManager.ts';
-    import { InputFileDragMode } from '@codebridger/lib-vue-components/elements.ts';
+    import { FileInputCombo } from '@codebridger/lib-vue-components/elements.ts';
     import { useRoute } from 'vue-router';
 
     const mediaManagerStore = useMediaManagerStore();
