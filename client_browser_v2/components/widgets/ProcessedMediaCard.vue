@@ -33,7 +33,7 @@
         </div>
 
         <section v-else>
-            <Tabs :tabs="tabs" v-model="activeTab" class="mx-4 border-b-[1px] border-gray-200 dark:border-gray-700" :classes="{ inner: 'tabs-m-0' }">
+            <Tabs :tabs="tabs" v-model="activeTab" class="mx-4" :classes="{ inner: 'tabs-m-0' }">
                 <!-- Grouped Segments -->
                 <template #content-groupedSegments>
                     <draggable

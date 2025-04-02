@@ -17,7 +17,14 @@
             </template>
 
             <template #content>
-                <NuxtPage />
+                <div class="flex p-4">
+                    <div class="w-2/5">
+                        <VideoProjectSidebar />
+                    </div>
+                    <div class="w-3/5">
+                        <NuxtPage />
+                    </div>
+                </div>
             </template>
         </DashboardShell>
 

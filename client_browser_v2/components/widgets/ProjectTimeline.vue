@@ -1,6 +1,6 @@
 <template>
     <section class="relative">
-        <div class="flex w-[400px] items-center justify-between">
+        <div class="flex items-center justify-between">
             <h3 size="md" class="mx-4 my-2 text-gray-600 dark:bg-gray-700">
                 {{ title }}
             </h3>
@@ -16,7 +16,7 @@
 
         <draggable
             :key="componentKey"
-            :class="['rounded border-[1px] border-solid border-gray-200 p-1 dark:border-gray-700', 'overflow-y-auto', 'h-[550px] w-[400px]']"
+            :class="['rounded border-[1px] border-solid border-gray-200 p-1 dark:border-gray-700', 'overflow-y-auto', 'min-h-[200px]']"
             v-model="timelineGroupedSegments"
             :group="{ name: 'grouped-segments', pull: 'clone', put: true }"
             :sort="true"

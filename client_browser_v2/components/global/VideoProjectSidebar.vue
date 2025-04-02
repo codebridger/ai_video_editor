@@ -1,6 +1,6 @@
 <template>
     <section class="w-full">
-        <Tabs :tabs="tabs" v-model="activeTab" class="min-h-max">
+        <Tabs :tabs="tabs" v-model="activeTab" class="min-h-max rounded bg-white">
             <!-- Custom icons for tabs -->
             <template #icon-uploadMedia>
                 <Icon name="IconFolderMinus" />

@@ -1,6 +1,6 @@
 <template>
     <div>
-        <FileInputCombo autoUpload accept="video/*" @file-select="addUploadList" />
+        <FileInputCombo autoUpload accept="video/*" @file-select="addUploadList" class="m-4" />
     </div>
 </template>
 
