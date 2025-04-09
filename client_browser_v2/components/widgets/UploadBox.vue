@@ -9,6 +9,7 @@
             @file-upload="handleFileUpload"
             @file-upload-cancel="handleCancelUpload"
             @file-upload-delete="handleDeleteUpload"
+            :showPreview="showPreviewState"
         />
     </div>
 </template>
@@ -16,10 +17,11 @@
 <script setup lang="ts">
     import { useMediaManagerStore } from '../../stores/mediaManager.ts';
     import { FileInputCombo } from '@codebridger/lib-vue-components/elements.ts';
-    import { ref } from 'vue';
+    import { ref, watch } from 'vue';
 
     const mediaManagerStore = useMediaManagerStore();
     const fileInput = ref(null);
+    const showPreviewState = ref(false);
 
     // Define interface for the active uploads tracking
     interface ActiveUploads {
@@ -30,6 +32,22 @@
 
     // Track active uploads to allow cancellation
     const activeUploads = ref<ActiveUploads>({});
+
+    // Watch for changes in uploadList length to control preview with delay
+    watch(
+        () => mediaManagerStore.uploadList.length,
+        (newLength) => {
+            if (newLength > 0) {
+                showPreviewState.value = true;
+            } else {
+                // Add delay before hiding preview
+                setTimeout(() => {
+                    showPreviewState.value = false;
+                }, 1000); // 1 second delay, adjust as needed
+            }
+        },
+        { immediate: true }
+    );
 
     function handleFileSelect(payload: { files: File[] }) {
         console.log('Selected files:', payload.files);
@@ -146,5 +164,11 @@
 
         // Also remove it from the upload list if it's still there
         mediaManagerStore.uploadList = mediaManagerStore.uploadList.filter((file) => file.name !== fileName);
+
+        // Clear UI file progress if upload list is now empty
+        if (mediaManagerStore.uploadList.length === 0 && fileInput.value) {
+            // @ts-ignore
+            fileInput.value.clearFiles();
+        }
     }
 </script>
