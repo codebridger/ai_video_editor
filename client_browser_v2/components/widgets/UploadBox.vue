@@ -4,10 +4,8 @@
             class="m-4"
             ref="fileInput"
             accept="video/*"
-            autoUpload
-            :files="mediaManagerStore.uploadList"
-            :progress="uploadProgress"
-            @file-select="addUploadList"
+            :auto-upload="true"
+            @file-select="handleFileSelect"
             @file-upload="handleFileUpload"
             @file-upload-cancel="handleCancelUpload"
             @file-upload-delete="handleDeleteUpload"
@@ -18,61 +16,115 @@
 <script setup lang="ts">
     import { useMediaManagerStore } from '../../stores/mediaManager.ts';
     import { FileInputCombo } from '@codebridger/lib-vue-components/elements.ts';
-    import { computed } from 'vue';
+    import { ref } from 'vue';
 
     const mediaManagerStore = useMediaManagerStore();
+    const fileInput = ref(null);
 
-    // Calculate progress for each file in the upload list
-    const uploadProgress = computed(() => {
-        const progress: Record<string, number> = {};
-        mediaManagerStore.uploadList.forEach((file) => {
-            const progressValue = mediaManagerStore.checkUploadProgress(file) || 0;
-            progress[file.name] = progressValue;
-        });
-        return progress;
-    });
-
-    function addUploadList(payload: { files: File[] }) {
-        if (!payload.files.length) {
-            return;
-        }
-
-        payload.files.forEach((file) => {
-            if (mediaManagerStore.uploadList.some((f) => f.name === file.name)) {
-                return;
-            }
-
-            mediaManagerStore.uploadList.push(file);
-
-            // Only start upload if project ID exists
-            if (mediaManagerStore.projectId) {
-                mediaManagerStore.startUploadSession(file.name, mediaManagerStore.projectId);
-            } else {
-                console.error('Cannot upload file: Project ID is not set');
-            }
-        });
+    // Define interface for the active uploads tracking
+    interface ActiveUploads {
+        [key: string]: {
+            abort: () => void;
+        };
     }
 
-    function handleFileUpload(payload: { file: File }) {
-        if (!payload.file) {
-            return;
-        }
+    // Track active uploads to allow cancellation
+    const activeUploads = ref<ActiveUploads>({});
 
-        // Only start upload if project ID exists
-        if (mediaManagerStore.projectId) {
-            mediaManagerStore.startUploadSession(payload.file.name, mediaManagerStore.projectId);
-        } else {
+    function handleFileSelect(payload: { files: File[] }) {
+        console.log('Selected files:', payload.files);
+    }
+
+    function handleFileUpload(payload: { file: File; fileId: string }) {
+        const { file, fileId } = payload;
+
+        if (!mediaManagerStore.projectId) {
             console.error('Cannot upload file: Project ID is not set');
-        }
-    }
-
-    function handleCancelUpload(payload: { file: File }) {
-        if (!payload.file) {
+            if (fileInput.value) {
+                // @ts-ignore
+                fileInput.value.setFileStatus(fileId, 'error', 'Project ID is not set');
+            }
             return;
         }
 
-        // Remove the file from the upload list without completing the upload
-        mediaManagerStore.uploadList = mediaManagerStore.uploadList.filter((file) => file.name !== payload.file.name);
+        try {
+            // Start upload using mediaManager
+            // We're not actually creating an XHR here, but we need to track it
+            // for potential cancellation
+            const mockXhr = {
+                abort: () => {
+                    console.log(`Aborting upload for ${file.name}`);
+                    // Remove from upload list
+                    mediaManagerStore.uploadList = mediaManagerStore.uploadList.filter((f) => f.name !== file.name);
+                },
+            };
+
+            // Track the upload for potential cancellation
+            activeUploads.value[fileId] = mockXhr;
+
+            // Add file to upload list if not already there
+            if (!mediaManagerStore.uploadList.some((f) => f.name === file.name)) {
+                mediaManagerStore.uploadList.push(file);
+            }
+
+            // Set up an interval to check progress
+            const progressInterval = setInterval(() => {
+                const progress = mediaManagerStore.checkUploadProgress(file);
+                if (progress !== undefined) {
+                    // Update the component's progress display using fileId
+                    if (fileInput.value) {
+                        // @ts-ignore
+                        fileInput.value.updateFileProgress(fileId, progress);
+                    }
+
+                    // If upload is complete (progress is 100%), clear interval and set status
+                    if (progress === 100) {
+                        clearInterval(progressInterval);
+                        if (fileInput.value) {
+                            // @ts-ignore
+                            fileInput.value.setFileStatus(fileId, 'finished');
+                        }
+                        delete activeUploads.value[fileId];
+                    }
+                }
+            }, 500);
+
+            // Start the actual upload
+            mediaManagerStore
+                .startUploadSession(file.name, mediaManagerStore.projectId)
+                .then(() => {
+                    clearInterval(progressInterval);
+                    if (fileInput.value) {
+                        // @ts-ignore
+                        fileInput.value.setFileStatus(fileId, 'finished');
+                    }
+                    delete activeUploads.value[fileId];
+                })
+                .catch((error) => {
+                    clearInterval(progressInterval);
+                    if (fileInput.value) {
+                        // @ts-ignore
+                        fileInput.value.setFileStatus(fileId, 'error', error.message || 'Upload failed');
+                    }
+                    delete activeUploads.value[fileId];
+                });
+        } catch (error: any) {
+            if (fileInput.value) {
+                // @ts-ignore
+                fileInput.value.setFileStatus(fileId, 'error', error.message);
+            }
+        }
+    }
+
+    function handleCancelUpload(payload: { file: File; fileId: string }) {
+        const { file, fileId } = payload;
+
+        if (activeUploads.value[fileId]) {
+            // Abort the upload
+            activeUploads.value[fileId].abort();
+            delete activeUploads.value[fileId];
+            console.log(`Upload cancelled for ${file.name}`);
+        }
     }
 
     function handleDeleteUpload(payload: { file: File }) {
@@ -80,15 +132,19 @@
             return;
         }
 
+        const fileName = payload.file.name;
+
         // Find if this file was already uploaded and has a fileId
-        const fileDoc = mediaManagerStore.projectFiles.find((f) => f.fileName === payload.file.name);
+        const fileDoc = mediaManagerStore.projectFiles.find((f) => f.fileName === fileName);
 
         if (fileDoc) {
             // If the file was already uploaded, remove it from the project
-            mediaManagerStore.removeProjectFile(fileDoc._id);
+            mediaManagerStore.removeProjectFile(fileDoc._id).catch((error) => {
+                console.error('Failed to remove project file:', error);
+            });
         }
 
         // Also remove it from the upload list if it's still there
-        mediaManagerStore.uploadList = mediaManagerStore.uploadList.filter((file) => file.name !== payload.file.name);
+        mediaManagerStore.uploadList = mediaManagerStore.uploadList.filter((file) => file.name !== fileName);
     }
 </script>

@@ -1,7 +1,7 @@
 import { fileProvider, Types, functionProvider, dataProvider, authentication } from '@modular-rest/client';
 
 import { defineStore } from 'pinia';
-import { ref, computed } from 'vue';
+import { ref } from 'vue';
 
 import {
     VIDEO_PROJECT_DATABASE,
@@ -14,8 +14,6 @@ import {
 import { sleep } from '../helpers/promise';
 
 export const useMediaManagerStore = defineStore('mediaManagerStore', () => {
-    const authUser = computed(() => authentication.user);
-
     const projectId = ref<string>('');
 
     // The uploaded files for the project, Native cms files
@@ -77,7 +75,7 @@ export const useMediaManagerStore = defineStore('mediaManagerStore', () => {
                 database: VIDEO_PROJECT_DATABASE.DATABASE,
                 collection: VIDEO_PROJECT_DATABASE.PROJECT_COLLECTION,
                 query: {
-                    userId: authUser.value?.id,
+                    userId: authentication.user?.id,
                     _id: id,
                 },
             })
@@ -101,7 +99,7 @@ export const useMediaManagerStore = defineStore('mediaManagerStore', () => {
         uploadProgressList.value = {};
 
         return fileProvider
-            .getFileDocsByTag(projectId, authUser.value?.id!)
+            .getFileDocsByTag(projectId, authentication.user?.id!)
             .then((files) => {
                 projectFiles.value = files;
             })
@@ -132,7 +130,7 @@ export const useMediaManagerStore = defineStore('mediaManagerStore', () => {
             .find<VideoRevisionType>({
                 database: VIDEO_PROJECT_DATABASE.DATABASE,
                 collection: VIDEO_PROJECT_DATABASE.VIDEO_REVISION,
-                query: { projectId, userId: authUser.value?.id },
+                query: { projectId, userId: authentication.user?.id },
             })
             .then((revisions) => {
                 videoRevisions.value = revisions;
@@ -257,7 +255,7 @@ export const useMediaManagerStore = defineStore('mediaManagerStore', () => {
             database: VIDEO_PROJECT_DATABASE.DATABASE,
             collection: VIDEO_PROJECT_DATABASE.PROJECT_COLLECTION,
             query: {
-                userId: authUser.value?.id,
+                userId: authentication.user?.id,
                 _id: projectId.value,
             },
             update: {
@@ -274,7 +272,7 @@ export const useMediaManagerStore = defineStore('mediaManagerStore', () => {
                 name: 'generateTimeline',
                 args: {
                     prompt,
-                    userId: authUser.value?.id,
+                    userId: authentication.user?.id,
                     projectId: projectId.value,
                 },
             })
@@ -289,7 +287,7 @@ export const useMediaManagerStore = defineStore('mediaManagerStore', () => {
             args: {
                 prompt: context.prompt,
                 projectId: projectId.value,
-                userId: authUser.value?.id,
+                userId: authentication.user?.id,
             },
         });
     }
@@ -300,7 +298,7 @@ export const useMediaManagerStore = defineStore('mediaManagerStore', () => {
                 name: 'generateTimelinePreview',
                 args: {
                     projectId: projectId.value,
-                    userId: authUser.value?.id,
+                    userId: authentication.user?.id,
                 },
             })
             .then(() => {
@@ -317,7 +315,7 @@ export const useMediaManagerStore = defineStore('mediaManagerStore', () => {
         const fileDoc = await fileProvider.getFileDoc(
             fileId,
             // @ts-ignore
-            authUser.value?.id
+            authentication.user?.id
         );
 
         if (!fileDoc) {
@@ -341,7 +339,7 @@ export const useMediaManagerStore = defineStore('mediaManagerStore', () => {
                 collection: VIDEO_PROJECT_DATABASE.VIDEO_REVISION,
                 query: {
                     _id: revisionId,
-                    userId: authUser.value?.id,
+                    userId: authentication.user?.id,
                     fileId: revision?.fileId,
                 },
             })
