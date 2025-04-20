@@ -16,7 +16,7 @@ const CLIENT_ID = process.env.GOOGLE_OAUTH_CLIENT_ID;
 const REDIRECT_URI = process.env.API_BASE_URL + "/auth/google/code-login";
 
 const REDIRECT_URI_DASHBOARD =
-  process.env.DASHBOARD_BASE_URL + "/auth/login_with_token";
+  process.env.DASHBOARD_BASE_URL + "/auth/g-oauth-redirect";
 
 const SCOPE =
   "https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile";

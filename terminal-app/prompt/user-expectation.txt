@@ -1,2 +1,0 @@
-- Pick different part of transcript, each part should contains 5-20 sentences.
-- Make a better version of the video keep the context, and the long story, just remove gaps.
