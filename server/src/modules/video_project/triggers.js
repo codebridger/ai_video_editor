@@ -21,8 +21,20 @@ module.exports.projectDocTriggers = [
       .exec()
       .then((mediaFile) => {
         mediaFile.forEach((file) => {
-          removeFile(file.fileId).catch((err) => {});
-          removeFile(file.lowQualityFileId).catch((err) => {});
+          if (
+            file.fileId &&
+            typeof file.fileId === "string" &&
+            file.fileId.trim() !== ""
+          ) {
+            removeFile(file.fileId).catch((err) => {});
+          }
+          if (
+            file.lowQualityFileId &&
+            typeof file.lowQualityFileId === "string" &&
+            file.lowQualityFileId.trim() !== ""
+          ) {
+            removeFile(file.lowQualityFileId).catch((err) => {});
+          }
         });
       });
 
@@ -35,7 +47,13 @@ module.exports.projectDocTriggers = [
       .exec()
       .then((revisions) => {
         revisions.forEach((revision) => {
-          removeFile(revision.fileId).catch((err) => {});
+          if (
+            revision.fileId &&
+            typeof revision.fileId === "string" &&
+            revision.fileId.trim() !== ""
+          ) {
+            removeFile(revision.fileId).catch((err) => {});
+          }
         });
       });
 
@@ -61,8 +79,16 @@ module.exports.videoMediaTriggers = [
       projectService.getVideoProjectModels();
 
     // Remove all files
-    removeFile(fileId).catch((err) => {});
-    removeFile(lowQualityFileId).catch((err) => {});
+    if (fileId && typeof fileId === "string" && fileId.trim() !== "") {
+      removeFile(fileId).catch((err) => {});
+    }
+    if (
+      lowQualityFileId &&
+      typeof lowQualityFileId === "string" &&
+      lowQualityFileId.trim() !== ""
+    ) {
+      removeFile(lowQualityFileId).catch((err) => {});
+    }
   }),
 ];
 
@@ -70,7 +96,9 @@ module.exports.videoRevisionTriggers = [
   new DatabaseTrigger("remove-one", async ({ query, queryResult }) => {
     const { _id, fileId } = query;
 
-    removeFile(fileId).catch((err) => {});
+    if (fileId && typeof fileId === "string" && fileId.trim() !== "") {
+      removeFile(fileId).catch((err) => {});
+    }
   }),
 ];
 
@@ -90,8 +118,12 @@ module.exports.projectFileTriggers = [
   }),
 
   new DatabaseTrigger("remove-one", async ({ query, queryResult }) => {
-    getCollection(VIDEO_PROJECT.DATABASE, VIDEO_PROJECT.VIDEO_MEDIA)
-      .deleteOne({ fileId: query._id })
-      .exec();
+    try {
+      await getCollection(VIDEO_PROJECT.DATABASE, VIDEO_PROJECT.VIDEO_MEDIA)
+        .deleteOne({ fileId: query._id })
+        .exec();
+    } catch (error) {
+      console.error("Error removing video media:", error);
+    }
   }),
 ];

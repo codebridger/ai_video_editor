@@ -1,0 +1,38 @@
+{
+    "dashboard": "Dashboard",
+    "statistic": "Statistic",
+    "ai-video-editor": "AI Video Editor",
+    "description": "Description",
+    "type-here": "Type here...",
+    "auth": {
+        "sign-in": "Sign In",
+        "sign-out": "Sign Out",
+        "choose-account-type": "Use one of your social accounts to sing-in / sign-up.",
+        "sign-in-with-google": "SIGN IN WITH GOOGLE",
+        "sign-in-with-instagram": "SIGN IN WITH INSTAGRAM",
+        "do-not-have-account": "Don't have an account? ",
+        "sign-in-new-account": "Just sign-in you will get a new account.",
+        "login-boxed": "Login Boxed"
+    },
+    "video-project": {
+        "title": "Video Project",
+        "shorts": "Shorts",
+        "timeline": "Timeline",
+        "your-projects": "Your Projects",
+        "add-project": "Add Project",
+        "project-name": "Project Name",
+        "add-project-error": "Add Project Was Unsuccessful",
+        "generate-timeline": "Generate Timeline",
+        "remove-file": "Remove File",
+        "are-you-sure-you-want-to-remove-this-file": "Are you sure you want to remove this file?"
+    },
+    "or": "or",
+    "cancel": "Cancel",
+    "create": "Create",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "decline": "Decline",
+    "accept": "Accept",
+    "close": "Close"
+}

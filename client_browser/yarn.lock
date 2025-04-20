@@ -821,14 +821,10 @@
     "@rollup/pluginutils" "^5.1.0"
     json5 "^2.2.3"
 
-"@modular-rest/client@/Users/navid-shad/Projects/Personal/modular-rest/packages/client":
-  version "1.6.2"
-  dependencies:
-    axios "^0.21.0"
-    ts-bus "^2.3.1"
-
-"@modular-rest/client@file:../../modular-rest/packages/client":
-  version "1.6.2"
+"@modular-rest/client@^1.10.0":
+  version "1.10.0"
+  resolved "https://registry.yarnpkg.com/@modular-rest/client/-/client-1.10.0.tgz#fbf010f535db6cebea3ffdd4a3ce500d8184101f"
+  integrity sha512-wh3USDQUfqh+r4gUXocJ6LEVHpD5zN/IJzqtDr1b7LzTFuXMwzI9rBDoztTCg8UOHDkbf5ZNs/DHNGnqO1HSrg==
   dependencies:
     axios "^0.21.0"
     ts-bus "^2.3.1"

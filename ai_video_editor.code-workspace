@@ -1,8 +1,8 @@
 {
   "folders": [
-    // {
-    //   "path": "terminal-app"
-    // },
+    {
+      "path": "client_browser_v2"
+    },
     {
       "path": "client_browser/app",
       "name": "Client Browser App Layer"
