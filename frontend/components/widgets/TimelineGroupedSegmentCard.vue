@@ -28,7 +28,7 @@
 
 <script setup lang="ts">
     import { Card, IconButton, SwitchBall } from '@codebridger/lib-vue-components/elements.ts';
-    import type { TimelineGroupedSegmentType, SegmentType } from '../../types/project.type';
+    import type { TimelineGroupedSegmentType, SegmentType } from '../../types/project.type.ts';
     import { useMediaManagerStore } from '../../stores/mediaManager.ts';
 
     const mediaManagerStore = useMediaManagerStore();
