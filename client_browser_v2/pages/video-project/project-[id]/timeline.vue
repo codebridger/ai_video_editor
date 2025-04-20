@@ -1,9 +1,12 @@
 <template>
     <section class="flex w-full flex-col space-y-4 p-6">
+        <!-- Prompt to generate video -->
         <WidgetsPromptBox title="Prompt to generate video" v-model="prompt" :loading="isGeneratingTimeline" @generate="generateTimeline" />
+
         <section class="flex flex-col gap-4">
+            <!-- Timeline and renders tabs -->
             <Tabs :tabs="tabs" v-model="activeTab" class="my-4 min-h-max rounded bg-white">
-                <!-- Custom content for each tab -->
+                <!-- Timeline tabs and render preview button -->
                 <template #content-timeline>
                     <div class="m-2">
                         <WidgetsProjectTimeline
@@ -22,7 +25,7 @@
                     </div>
                 </template>
 
-                <!-- Rendered Video Revisions -->
+                <!-- Video Revisions tab -->
                 <template #content-renders>
                     <Card :class="['rounded', 'overflow-y-auto overflow-x-visible', 'shadow-none', 'min-h-[200px]', 'm-2']">
                         <template v-for="revision in mediaManager.videoRevisions" :key="revision._id">
@@ -60,6 +63,8 @@
                     </Card>
                 </template>
             </Tabs>
+
+            <!-- Video Player -->
             <WidgetsVideoPlayer class="flex-1" />
         </section>
     </section>
