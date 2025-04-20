@@ -57,7 +57,7 @@ This command compiles the application and outputs the result to the `.nuxt/dist/
 ## Key Configurations
 
 *   **`nuxt.config.ts`:** The main configuration file for Nuxt. Defines modules, plugins, build settings, runtime config, etc.
-*   **`.env`:** Environment variables (copied from `.env.sample`). Used for sensitive information or environment-specific settings like the API base URL (`API_BASE_URL`). *(Ignored by Git)*
+*   **`.env`:** Used for environment variables (though no `.env.sample` exists). Potentially used for `API_BASE_URL` or other runtime configuration accessed via `useRuntimeConfig()`. *(Ignored by Git)*
 *   **`i18n.config.ts`:** Configuration for the `@nuxtjs/i18n` module.
 *   **`tailwind.config.cjs`:** Configuration file for Tailwind CSS.
 
@@ -67,7 +67,7 @@ This command compiles the application and outputs the result to the `.nuxt/dist/
 
 ## API Communication
 
-API requests to the backend server are handled using the `@modular-rest/client`. Configuration (like the base URL) is typically handled via Nuxt runtime config, which reads from `.env`.
+API requests to the backend server are handled using the `@modular-rest/client`. Configuration (like the base URL) is typically handled via Nuxt runtime config, which might read from `.env`.
 Composables like `useApi` likely abstract the API calls.
 
 ## Styling

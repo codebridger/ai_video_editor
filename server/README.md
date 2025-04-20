@@ -43,8 +43,8 @@ This command uses `nodemon` to automatically restart the server on file changes.
 
 ## Key Configurations
 
-*   **`.env`:** Contains essential configuration and secrets, such as database connection strings (if any), API keys for external services (Google Cloud, OpenAI, Groq), and server settings (e.g., port). Copy from `.env.sample` and fill in the values.
-*   **`google-credentials.json`:** A Google Cloud service account key file required for authenticating Google Cloud API calls (like Speech-to-Text). Obtain this from your Google Cloud project console and place it in the `server/` directory.
+*   **`.env`:** Contains essential configuration and secrets. Since a `.env.sample` file is not provided, developers need to create this file manually or copy it from an existing setup. It likely contains API keys (Google Cloud, OpenAI, Groq), server port settings, potential database connection strings, and other environment-specific values. Refer to the code where `process.env` is used (especially during application startup or in module configurations) to determine the required variables. *(Ignored by Git)*
+*   **`google-credentials.json`:** A Google Cloud service account key file required for authenticating Google Cloud API calls (like Speech-to-Text). Obtain this from your Google Cloud project console and place it in the `server/` directory. *(Ignored by Git)*
 *   Module configurations within `src/modules/` or potentially a central configuration file within `src/` might exist for the `@modular-rest/server` framework.
 
 ## API Endpoints
@@ -76,4 +76,40 @@ Video manipulation is handled using `fluent-ffmpeg`, a wrapper around the FFmpeg
 
 ## Environment Variables
 
-Configuration is primarily managed via the `.env` file, loaded using `dotenv`. Ensure all required variables specified in `.env.sample` are correctly set in your local `.env` file before running the server. 
+Configuration is primarily managed via the `.env` file in the `server/` directory, loaded using `dotenv`. Create a `.env` file and populate it with the following variables, adjusting values as needed for your environment:
+
+```dotenv
+# Runtime environment (e.g., development, production)
+NODE_ENV=development
+
+# Port the backend server listens on
+PORT=8080
+
+# Hostname the server binds to
+HOST=localhost
+
+# Base URL of the frontend application (used for CORS, redirects)
+FRONT_END_URL=http://localhost:3000
+
+# === Security ===
+# (Required, Secret) Strong, unique secret for signing JWTs
+JWT_SECRET_KEY=your_strong_secret_here
+# How long JWTs are valid (e.g., 7d, 1h, 30m)
+JWT_EXPIRES_IN=7d
+
+# === Google Cloud ===
+# (Required) Your Google Cloud Project ID
+GOOGLE_PROJECT_ID=your-gcp-project-id
+# (Required) Path to the Google Cloud service account key file
+GOOGLE_APPLICATION_CREDENTIALS=./google-credentials.json
+
+# === External AI Services ===
+# (Required) Your OpenAI API key
+OPENAI_API_KEY=sk-your-openai-key-here
+# (Required) Your Google Gemini API key
+GEMINI_API_KEY=your-gemini-api-key-here
+# (Required) Your Groq API key
+GROQ_API_KEY=gsk_your-groq-key-here
+```
+
+**Important:** Ensure you create a `.env` file in the `server/` directory and populate it with the correct values for your setup. Do not commit the `.env` file to Git. 
